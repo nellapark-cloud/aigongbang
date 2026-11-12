@@ -6,6 +6,9 @@
 <title>대니의 AI 공방 · 교회와 사역자를 위한 AI 강의와 제작</title>
 <meta name="description" content="대니의 AI 공방 · 교회 AI 강의, 목회자 AI 교육, 작은 교회 홈페이지 만들기. 코딩을 배운 적 없는 작은 교회 목사가 AI로 홈페이지, 업무 앱, 교재를 만든 경험을 나누는 실습 중심 강의입니다.">
 <meta name="keywords" content="교회 AI 강의, 목회자 AI 교육, 교회 AI, 작은 교회 홈페이지, 설교 준비 AI, 대니의 AI 공방, 박동준, 대니의 AI 공방 대표">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="canonical" href="https://aigongbang.kr/">
 <meta name="google-site-verification" content="9yXdC-STSqIAO3-lTz_0N1CFFgK5PxVlR1Tm1G4Egnw" />
 <meta property="og:type" content="website">
@@ -36,7 +39,9 @@ button{font-family:inherit}
 .top{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .top .wrap{height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--navy);font-size:16px;white-space:nowrap}
-.logo i{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#9ccbf1,#c9b8ef);display:grid;place-items:center;font-style:normal;color:#fff;font-size:14px;font-family:'Noto Serif KR',serif}
+.logo i{position:relative;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#8EA6F2,#B3A1EA);display:grid;place-items:center;font-style:normal;color:#fff;font-size:19px;font-weight:800;line-height:1;flex-shrink:0}
+.logo i svg{position:absolute;top:4px;right:4px;width:9px;height:9px}
+.logo .ai{background:linear-gradient(135deg,#8EA6F2,#B3A1EA);color:#fff;border-radius:7px;padding:0 6px;margin:0 1px;font-weight:800}
 .logo small{font-weight:500;color:var(--sub);font-size:13px}
 .gnb{display:flex;gap:2px}
 .gnb a{font-size:14px;color:var(--sub);padding:8px 13px;border-radius:9px;transition:.2s}
@@ -217,7 +222,7 @@ footer nav a:hover{color:#fff}
 
 <header class="top">
   <div class="wrap">
-    <a href="#home" class="logo"><i>대</i>대니의 AI 공방 <small>교회와 사역자를 위한 AI 강의</small></a>
+    <a href="#home" class="logo" aria-label="대니의 AI 공방 홈"><i>대<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8 C54 38 62 46 92 50 C62 54 54 62 50 92 C46 62 38 54 8 50 C38 46 46 38 50 8 Z" fill="#fff"/></svg></i><span>대니의 <span class="ai">AI</span> 공방</span> <small>교회와 사역자를 위한 AI 강의</small></a>
     <nav class="gnb" id="gnb">
       <a href="#home" data-p="home">홈</a>
       <a href="#about" data-p="about">강사 소개</a>
