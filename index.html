@@ -44,6 +44,17 @@ button{font-family:inherit}
 .page{display:none;animation:fade .35s ease}
 .page.on{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* 문패 */
+.signwrap{position:relative;display:inline-block;padding-top:34px;margin-bottom:26px}
+.signwrap svg.cord{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:38px;overflow:visible}
+.plate{position:relative;display:flex;flex-direction:column;align-items:center;padding:14px 30px 13px;background:linear-gradient(160deg,#28416b,#1c2f4f 60%);border:2px solid #c39a4c;border-radius:14px;color:#fff;box-shadow:0 14px 30px rgba(28,47,79,.22),inset 0 0 0 4px rgba(195,154,76,.18);transform-origin:50% -34px;animation:swing 5s ease-in-out infinite}
+.plate small{font-size:11px;letter-spacing:.32em;color:#e3c27f;font-weight:800}
+.plate strong{font-family:'Noto Serif KR',serif;font-size:24px;letter-spacing:.04em;margin:3px 0 2px;line-height:1.3}
+.plate span{font-size:12.5px;color:#c9d6ea}
+.plate i{position:absolute;top:8px;width:6px;height:6px;border-radius:50%;background:#c39a4c}
+.plate i.l{left:10px}.plate i.r{right:10px}
+@keyframes swing{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+@media (prefers-reduced-motion:reduce){.plate{animation:none}}
 section{padding:80px 0}
 .soft{background:var(--soft)}
 .eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.14em;color:var(--blue);text-transform:uppercase}
@@ -217,6 +228,10 @@ footer nav a:hover{color:#fff}
   <div class="hero">
     <div class="wrap">
       <div>
+        <div class="signwrap" aria-label="2027년 오픈 예정">
+          <svg class="cord" viewBox="0 0 120 38" aria-hidden="true"><path d="M14 38 L60 6 L106 38" fill="none" stroke="#c39a4c" stroke-width="1.6"/><circle cx="60" cy="6" r="4.5" fill="#1c2f4f" stroke="#c39a4c" stroke-width="1.5"/></svg>
+          <div class="plate"><i class="l"></i><i class="r"></i><small>OPEN 2027</small><strong>2027년 오픈 예정</strong><span>지금은 강의·제작 문의를 미리 받고 있어요</span></div>
+        </div>
         <div class="eyebrow">DANNY'S AI WORKSHOP</div>
         <h1 style="margin-top:14px">코딩을 몰라도 괜찮아요.<br><em>AI와 함께라면</em><br>작은 교회도 할 수 있어요.</h1>
         <p>성도 30명 교회 목사가 AI와 함께 홈페이지, 업무 앱, 성경공부 교재를 직접 만들었습니다. 그 과정을 그대로, 따라 할 수 있게 나눕니다.</p>
