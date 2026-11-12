@@ -112,7 +112,10 @@ h2{font-size:clamp(25px,3.6vw,34px);color:var(--navy);font-weight:800;letter-spa
 
 /* portfolio */
 .work{padding:0;overflow:hidden}
-.work .th{height:130px;display:grid;place-items:center}
+.work .th{height:130px;display:grid;place-items:center;position:relative}
+.wk{cursor:pointer;transition:.2s;color:inherit}
+.wk:hover{border-color:var(--sky2);transform:translateY(-3px);box-shadow:0 12px 26px rgba(28,47,79,.06)}
+.lockb{position:absolute;top:12px;right:12px;font-size:11.5px;font-weight:700;background:#fff;color:var(--navy);padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
 .work .th svg{width:48px;height:48px;stroke:var(--navy);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
 .work .bd{padding:20px 22px 24px}
 .work .c{font-size:12px;font-weight:800;color:var(--blue);margin-bottom:4px}
@@ -154,6 +157,10 @@ form textarea{min-height:110px;resize:vertical}
 .result.on{display:block}
 .result pre{white-space:pre-wrap;font-family:inherit;font-size:14px;color:var(--ink);margin:8px 0 12px}
 .info li{list-style:none;padding:14px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.notice{margin-top:18px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:18px 18px 12px}
+.notice>b{display:block;color:var(--navy);font-size:15px;margin-bottom:6px}
+.notice li{font-size:14px}
+.notice strong{color:var(--navy)}
 .info li b{display:block;color:var(--navy);font-size:13px;margin-bottom:2px}
 
 footer{background:var(--navy);color:#b9c8dc;padding:46px 0;font-size:13.5px}
@@ -262,7 +269,7 @@ footer nav a:hover{color:#fff}
       <p class="desc">AI를 설명하는 강의는 많습니다. 이 강의는 목회 현장에서 실제로 써 본 사람이, 실제 결과물로 이야기합니다.</p>
       <div class="g3">
         <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/></svg></div><h3>현장에서 나온 강의</h3><p>강의에서 보여 드리는 예시는 모두 은혜교회에서 지금 쓰고 있는 결과물입니다.</p></div>
-        <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div><h3>한 사람도 놓치지 않는 실습</h3><p>듣고 끝나는 강의가 아니에요. 강의가 끝날 때 모두 손에 결과물 하나씩을 들고 갑니다.</p></div>
+        <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div><h3>5명 이하 소수 실습</h3><p>코딩을 몰라도 괜찮아요. 결과물을 만드는 강의는 5명 이하로 진행해서, 모두 손에 결과물 하나씩을 들고 갑니다.</p></div>
         <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg></div><h3>편리함보다 분별</h3><p>설교와 교재에 AI를 쓸 때 무엇을 맡기고 무엇을 지킬지, 신앙의 기준을 함께 세웁니다.</p></div>
       </div>
     </div>
@@ -316,7 +323,7 @@ footer nav a:hover{color:#fff}
     <div class="wrap">
       <div class="eyebrow">Lectures</div>
       <h2>강의 과정</h2>
-      <p class="desc">한 강의만 고르셔도 되고, 여러 강의를 묶어 과정으로 진행할 수도 있어요. 카드를 누르면 자세한 내용이 열립니다.</p>
+      <p class="desc">모든 강의는 실전 위주예요. 한 강의만 고르셔도 되고, 여러 강의를 묶어 과정으로 진행할 수도 있어요. 결과물을 만드는 실습 강의는 5명 이하로 진행합니다. 카드를 누르면 자세한 내용이 열려요.</p>
       <div class="filter" id="lecFilter">
         <button class="on" data-f="all">전체</button>
         <button data-f="입문">입문</button>
@@ -348,7 +355,7 @@ footer nav a:hover{color:#fff}
     <div class="wrap">
       <div class="eyebrow">Portfolio</div>
       <h2>AI와 함께 만든 것들</h2>
-      <p class="desc">모두 지금 실제로 쓰이고 있는 결과물이에요. 강의에서 이 결과물을 만든 과정을 그대로 보여 드립니다.</p>
+      <p class="desc">모두 지금 실제로 쓰이고 있는 결과물이에요. 카드를 누르면 열어 보실 수 있어요. 재정이나 출석처럼 성도 정보가 담긴 결과물은 공개하지 않고, 강의 문의를 주시면 시연으로 보여 드립니다.</p>
       <div class="g3" id="workList"></div>
     </div>
   </section>
@@ -375,7 +382,7 @@ footer nav a:hover{color:#fff}
       <h2>자주 묻는 질문</h2>
       <div style="margin-top:20px">
         <details class="faq"><summary>컴퓨터를 잘 못하는 분들도 들을 수 있나요?</summary><p>네. 입문 강의는 휴대폰만 있으면 되고, 도우미를 두어 막히는 분을 먼저 돕습니다. 장년 성도님들이 가장 많이 들으시는 강의예요.</p></details>
-        <details class="faq"><summary>강의 인원은 몇 명까지 가능한가요?</summary><p>실습이 있는 강의는 20명 안팎을 권해 드려요. 특강이나 세미나 형식은 인원 제한 없이 진행할 수 있습니다.</p></details>
+        <details class="faq"><summary>강의 인원은 몇 명까지 가능한가요?</summary><p>직접 결과물을 만들어 가는 실습 중심 강의는 한 사람 한 사람 끝까지 도와드리기 위해 5명 이하로만 진행해요. 특강이나 세미나 형식은 인원 제한 없이 진행할 수 있습니다.</p></details>
         <details class="faq"><summary>교회로 직접 와 주실 수 있나요?</summary><p>네, 요청하신 곳으로 찾아갑니다. 온라인 강의도 상담해 주세요.</p></details>
         <details class="faq"><summary>필요한 장비가 있나요?</summary><p>입문은 휴대폰과 와이파이, 실무·확장 강의는 노트북이 필요해요. 강사용으로는 화면을 띄울 TV나 빔프로젝터가 있으면 됩니다.</p></details>
         <details class="faq"><summary>AI 사용에 부정적인 분들이 계시면요?</summary><p>오히려 좋은 기회예요. 08강 '분별' 특강처럼 우려를 함께 나누고 기준을 세우는 시간을 강의 안에 넣을 수 있습니다.</p></details>
@@ -398,6 +405,14 @@ footer nav a:hover{color:#fff}
             <li><b>이메일</b><a href="mailto:nellapark@gmail.com" style="color:var(--blue)">nellapark@gmail.com</a></li>
             <li style="border:0"><b>강의 장소</b>요청하신 곳으로 찾아갑니다<br>온라인 강의도 가능해요</li>
           </ul>
+          <div class="notice">
+            <b>강의 안내</b>
+            <ul class="dot">
+              <li><strong>실전 위주로 강의합니다.</strong> 이론보다 바로 써먹는 방법을 다뤄요.</li>
+              <li><strong>코딩을 잘 몰라도 괜찮아요.</strong> 원하는 결과물에 어떻게 이를 수 있는지, 직접 만들어 본 경험을 바탕으로 알려 드립니다.</li>
+              <li><strong>결과물을 만드는 실습 강의는 5명 이하</strong>로 인원을 제한해요. 한 분도 놓치지 않고 끝까지 완성하도록 돕기 위해서예요.</li>
+            </ul>
+          </div>
         </div>
         <div class="card">
           <form id="form">
@@ -449,21 +464,33 @@ var LEC=[
  {n:"08",t:"AI 시대의 목회와 분별",s:"무엇을 맡기고 무엇을 지킬 것인가",lv:"특화",who:"목회자 세미나",time:"60분",learn:["AI가 대신할 수 없는 목회의 자리","설교 표절, 저작권, 개인정보의 기준","성도들의 AI 사용을 안내하는 방향"],prac:"강의 후 소그룹 토론으로 우리 교회의 AI 사용 원칙을 세 문장으로 정리합니다.",need:"없음"}
 ];
 var WORK=[
- {c:"웹사이트",k:"c1",t:"은혜교회 홈페이지와 자료실",d:"메뉴별 페이지, 주보 게시판, 성경공부 자료실까지 직접 설계하고 GitHub Pages로 무료 운영합니다.",i:'<path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-5h4v5"/>'},
- {c:"웹사이트",k:"c5",t:"GIVEN MINISTRY 사이트",d:"여러 교회가 함께하는 문화사역 공동체의 9페이지 사이트. 팀 소개, 연혁, 프로젝트를 담았습니다.",i:'<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5"/><path d="M11 20c0-3 2.5-5 5-5s5 2 5 5"/>'},
- {c:"웹사이트",k:"c2",t:"그레이스워십 랜딩페이지",d:"찬양팀 소개, 사역, 유튜브 영상을 담은 한 페이지 사이트입니다.",i:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'},
- {c:"웹사이트",k:"c4",t:"대니의 AI 공방 (이 사이트)",d:"지금 보고 계신 강사 홈페이지예요. 기획, 디자인, 문의 양식, 도메인 연결, 검색 등록까지 AI와 함께 하루 만에 만들었습니다.",i:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/>'},
- {c:"업무 앱",k:"c4",t:"출석 관리 앱",d:"휴대폰으로 체크하면 구글 시트에 바로 쌓이는 출석 앱입니다.",i:'<rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16"/><path d="m9 15 2 2 4-4"/>'},
- {c:"업무 앱",k:"c3",t:"재정기록부",d:"장부, 영수증 첨부, 통계, 기부금영수증 발급, 회원 승인까지. 다른 교회용 서비스로 확장을 준비하고 있습니다.",i:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/>'},
- {c:"업무 앱",k:"c1",t:"행정 서식과 행사 큐시트",d:"기부금영수증, 경력증명서, 추천서, 재적증명서를 화면에서 입력하고 PDF로 저장합니다.",i:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h5"/>'},
- {c:"교육 콘텐츠",k:"c3",t:"성경 세부 강해 시리즈",d:"로마서 전권과 에베소서, 빌립보서, 사사기, 학개, 요한계시록을 절별로 풀었습니다.",i:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>'},
- {c:"교육 콘텐츠",k:"c4",t:"새가족 8주 양육교재",d:"빈칸을 누르면 답이 나오는 교재를 한국어, 영어, 일본어로 만들었습니다.",i:'<path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.5-7 11-7 11z"/>'}];
+ {c:"웹사이트",k:"c1",u:"https://sejonggrace.com/",t:"은혜교회 홈페이지와 자료실",d:"메뉴별 페이지, 주보 게시판, 성경공부 자료실까지 직접 설계하고 GitHub Pages로 무료 운영합니다.",i:'<path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-5h4v5"/>'},
+ {c:"웹사이트",k:"c5",u:"https://givenministry.com/",t:"GIVEN MINISTRY 사이트",d:"여러 교회가 함께하는 문화사역 공동체의 9페이지 사이트. 팀 소개, 연혁, 프로젝트를 담았습니다.",i:'<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5"/><path d="M11 20c0-3 2.5-5 5-5s5 2 5 5"/>'},
+ {c:"웹사이트",k:"c2",u:"https://nellapark-cloud.github.io/grace-worship/",t:"그레이스워십 랜딩페이지",d:"찬양팀 소개, 사역, 유튜브 영상을 담은 한 페이지 사이트입니다.",i:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'},
+ {c:"웹사이트",k:"c4",u:"#home",t:"대니의 AI 공방 (이 사이트)",d:"지금 보고 계신 강사 홈페이지예요. 기획, 디자인, 문의 양식, 도메인 연결, 검색 등록까지 AI와 함께 하루 만에 만들었습니다.",i:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/>'},
+ {c:"업무 앱",k:"c4",lock:1,t:"출석 관리 앱",d:"휴대폰으로 체크하면 구글 시트에 바로 쌓이는 출석 앱입니다.",i:'<rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16"/><path d="m9 15 2 2 4-4"/>'},
+ {c:"업무 앱",k:"c3",lock:1,t:"재정기록부",d:"장부, 영수증 첨부, 통계, 기부금영수증 발급, 회원 승인까지. 다른 교회용 서비스로 확장을 준비하고 있습니다.",i:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/>'},
+ {c:"업무 앱",k:"c1",lock:1,t:"행정 서식과 행사 큐시트",d:"기부금영수증, 경력증명서, 추천서, 재적증명서를 화면에서 입력하고 PDF로 저장합니다.",i:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h5"/>'},
+ {c:"교육 콘텐츠",k:"c3",u:"https://sejonggrace.com/archive.html",t:"성경 세부 강해 시리즈",d:"로마서 전권과 에베소서, 빌립보서, 사사기, 학개, 요한계시록을 절별로 풀었습니다.",i:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>'},
+ {c:"교육 콘텐츠",k:"c4",u:"https://sejonggrace.com/archive.html",t:"새가족 8주 양육교재",d:"빈칸을 누르면 답이 나오는 교재를 한국어, 영어, 일본어로 만들었습니다.",i:'<path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.5-7 11-7 11z"/>'}];
 
 function el(id){return document.getElementById(id)}
 function lecCard(x){return '<div class="card lec" data-n="'+x.n+'" data-lv="'+x.lv+'"><div class="n">'+x.n+'</div><h3>'+x.t+'</h3><p>'+x.s+'</p><div class="tags"><span class="tag lv">'+x.lv+'</span><span class="tag">'+x.who+'</span><span class="tag">'+x.time+'</span></div><div class="more">자세히 보기 →</div></div>'}
 el('lecList').innerHTML = LEC.map(lecCard).join('');
 el('homeLec').innerHTML = [LEC[0],LEC[1],LEC[3]].map(lecCard).join('');
-el('workList').innerHTML = WORK.map(function(w){return '<div class="card work"><div class="th '+w.k+'"><svg viewBox="0 0 24 24">'+w.i+'</svg></div><div class="bd"><div class="c">'+w.c+'</div><h3>'+w.t+'</h3><p>'+w.d+'</p></div></div>'}).join('');
+el('workList').innerHTML = WORK.map(function(w,n){
+  var inner='<div class="th '+w.k+'"><svg viewBox="0 0 24 24">'+w.i+'</svg>'+(w.lock?'<span class="lockb">문의 시 공개</span>':'')+'</div><div class="bd"><div class="c">'+w.c+'</div><h3>'+w.t+'</h3><p>'+w.d+'</p><div class="more">'+(w.lock?'시연 안내 보기 →':(w.u.charAt(0)==='#'?'처음 화면으로 →':'사이트 열기 ↗'))+'</div></div>';
+  if(w.lock) return '<div class="card work wk" data-w="'+n+'" role="button" tabindex="0">'+inner+'</div>';
+  return '<a class="card work wk" href="'+w.u+'"'+(w.u.charAt(0)==='#'?'':' target="_blank" rel="noopener"')+'>'+inner+'</a>';
+}).join('');
+function openLock(w){
+  el('sheet').innerHTML='<button class="x" id="x">✕</button><div class="eyebrow">'+w.c+'</div><h3>'+w.t+'</h3><p style="font-size:14.5px;color:var(--sub);margin-top:8px">'+w.d+'</p>'+
+   '<h4>문의하시면 보여 드려요</h4><p style="font-size:14.5px">재정이나 출석처럼 성도 정보가 담긴 결과물은 공개하지 않아요. 강의를 문의하시면 실제 화면 시연과 만드는 과정을 안내해 드립니다.</p>'+
+   '<a href="#contact" class="btn pri" id="ask2" style="margin-top:22px">시연 문의하기 →</a>';
+  el('modal').classList.add('on'); el('x').onclick=closeM; el('ask2').onclick=closeM;
+}
+el('workList').addEventListener('click',function(e){ var c=e.target.closest('[data-w]'); if(c) openLock(WORK[+c.dataset.w]); });
+el('workList').addEventListener('keydown',function(e){ var c=e.target.closest('[data-w]'); if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault(); openLock(WORK[+c.dataset.w]);} });
 el('lecSelect').innerHTML += LEC.map(function(x){return '<option>'+x.n+'강 · '+x.t+'</option>'}).join('');
 
 // lecture filter
