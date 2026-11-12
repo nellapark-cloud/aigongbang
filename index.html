@@ -176,6 +176,31 @@ form input,form select,form textarea{width:100%;font-family:inherit;font-size:15
 form input:focus,form select:focus,form textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--sky)}
 form textarea{min-height:110px;resize:vertical}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* board */
+.board{margin-top:48px}
+.bhead{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px}
+.bhead h3{font-size:19px;color:var(--navy);font-weight:700}
+.bhead span{font-size:13px;color:var(--sub)}
+.btable{width:100%;border-collapse:collapse;font-size:14px;border-top:2px solid var(--navy)}
+.btable th{font-weight:500;color:var(--sub);font-size:13px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--soft);text-align:left}
+.btable td{padding:8px 10px;border-bottom:1px solid var(--line);color:var(--ink);font-weight:400}
+.btable .c{text-align:center;width:64px;color:var(--sub)}
+.btable .w{width:96px}.btable .d{width:104px;color:var(--sub)}
+.btable button{border:0;background:none;font:inherit;color:var(--ink);cursor:pointer;padding:0;text-align:left;display:inline-flex;align-items:center;gap:6px}
+.btable button:hover{color:var(--blue);text-decoration:underline}
+.btable svg{width:13px;height:13px;stroke:var(--sub);fill:none;stroke-width:2;flex-shrink:0}
+.btable .em{font-size:12px;color:var(--sub)}
+.btable .empty{text-align:center;color:var(--sub);padding:28px 10px}
+.pager{display:flex;justify-content:center;gap:4px;margin-top:16px;flex-wrap:wrap}
+.pager button{min-width:34px;height:34px;border:1px solid var(--line);background:#fff;border-radius:8px;font:inherit;font-size:13.5px;color:var(--sub);cursor:pointer}
+.pager button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.pager button:disabled{opacity:.4;cursor:default}
+.bview dl{display:grid;grid-template-columns:96px 1fr;gap:6px 12px;font-size:14px;margin:16px 0}
+.bview dt{color:var(--sub)}.bview dd{color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.bmsg{font-size:13.5px;color:#b3412e;margin-top:8px;min-height:1em}
+.bnote{font-size:13px;color:var(--sub);margin-top:4px}
+.bbtns{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+@media(max-width:640px){.btable .w{width:72px}.btable .d{width:84px}.btable .c{width:44px}.btable th,.btable td{padding:8px 6px}}
 .result{display:none;margin-top:18px;background:var(--soft);border:1px dashed var(--sky2);border-radius:14px;padding:18px}
 .result.on{display:block}
 .result pre{white-space:pre-wrap;font-family:inherit;font-size:14px;color:var(--ink);margin:8px 0 12px}
@@ -486,6 +511,8 @@ footer nav a:hover{color:#fff}
               <div><label>희망 날짜</label><input name="date" placeholder="예: 12월 둘째 주 토요일"></div>
               <div><label>회신받을 연락처</label><input name="tel" required placeholder="전화번호 또는 이메일"></div>
             </div>
+            <label>비밀번호 <span style="font-weight:400;color:var(--sub)">(문의 게시판에서 내 글을 보고 고칠 때 써요)</span></label>
+            <input type="password" name="pw" required minlength="4" maxlength="30" autocomplete="new-password" placeholder="4자 이상">
             <label>남기실 말씀</label>
             <textarea name="msg" placeholder="참석자 연령대, 교회 상황, 만들고 싶은 것, 궁금한 점을 편하게 적어 주세요."></textarea>
             <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
@@ -496,6 +523,14 @@ footer nav a:hover{color:#fff}
             <pre id="resultText"></pre>
           </div>
         </div>
+      </div>
+      <div class="board" id="board">
+        <div class="bhead"><h3>문의 게시판</h3><span>모든 문의는 비밀글이에요. 글쓴이와 공방 대표만 내용을 볼 수 있어요.</span></div>
+        <table class="btable">
+          <thead><tr><th class="c">번호</th><th>제목</th><th class="w">작성자</th><th class="d">날짜</th></tr></thead>
+          <tbody id="blist"><tr><td colspan="4" class="empty">불러오는 중…</td></tr></tbody>
+        </table>
+        <nav class="pager" id="pager" aria-label="게시판 페이지"></nav>
       </div>
     </div>
   </section>
@@ -509,6 +544,7 @@ footer nav a:hover{color:#fff}
 </footer>
 
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="modal" id="bmodal"><div class="sheet bview" id="bsheet" role="dialog" aria-modal="true" aria-label="문의 글"></div></div>
 
 <script>
 var LEC=[
@@ -589,7 +625,75 @@ function route(){
 window.addEventListener('hashchange',route); route();
 el('burger').onclick=function(){ el('gnb').classList.toggle('open'); };
 
-// form → 이메일로 전달
+// 문의 게시판 (구글 시트 + Apps Script)
+var BOARD_API='https://script.google.com/macros/s/AKfycbyexbMjKNcNEDG4jd0XZ7nkXZMhvIduAg0XXBOgDTTBoyCNjLix_yCGJbhkX7XV3WDx5A/exec';
+var LOCK='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+var bPage=1;
+function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function api(body){return fetch(BOARD_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(function(r){return r.json()})}
+function loadBoard(pg){
+  bPage=pg||1;
+  fetch(BOARD_API+'?page='+bPage).then(function(r){return r.json()}).then(function(j){
+    if(!j.ok) throw 0;
+    var tb=el('blist');
+    if(!j.items.length){ tb.innerHTML='<tr><td colspan="4" class="empty">아직 남겨진 문의가 없어요.</td></tr>'; }
+    else tb.innerHTML=j.items.map(function(x){
+      return '<tr><td class="c">'+x.no+'</td><td><button type="button" data-id="'+esc(x.id)+'">'+LOCK+esc(x.title)+'</button>'+(x.edited?' <span class="em">(수정됨)</span>':'')+'</td><td class="w">'+esc(x.name)+'</td><td class="d">'+esc(x.date)+'</td></tr>';
+    }).join('');
+    tb.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ askPw(b.dataset.id); }; });
+    var pg='', P=j.pages, start=Math.max(1,Math.min(bPage-4,P-9)), end=Math.min(P,start+9);
+    pg+='<button type="button" data-p="'+(bPage-1)+'" '+(bPage<=1?'disabled':'')+' aria-label="이전 페이지">‹</button>';
+    for(var n=start;n<=end;n++) pg+='<button type="button" data-p="'+n+'" class="'+(n===bPage?'on':'')+'"'+(n===bPage?' aria-current="page"':'')+'>'+n+'</button>';
+    pg+='<button type="button" data-p="'+(bPage+1)+'" '+(bPage>=P?'disabled':'')+' aria-label="다음 페이지">›</button>';
+    el('pager').innerHTML=pg;
+    el('pager').querySelectorAll('button').forEach(function(b){ b.onclick=function(){ loadBoard(+b.dataset.p); }; });
+  }).catch(function(){ el('blist').innerHTML='<tr><td colspan="4" class="empty">게시판을 잠시 불러오지 못했어요.</td></tr>'; });
+}
+function closeB(){ el('bmodal').classList.remove('on'); }
+el('bmodal').addEventListener('click',function(e){ if(e.target===this) closeB(); });
+function askPw(id){
+  el('bsheet').innerHTML='<button class="x" id="bx" aria-label="닫기">✕</button><h3>비밀글이에요</h3><p class="bnote">글을 쓸 때 정한 비밀번호를 넣어 주세요.</p>'+
+    '<form id="pwf"><label for="bpw">비밀번호</label><input type="password" id="bpw" required autocomplete="current-password"><div class="bmsg" id="bmsg" role="alert"></div>'+
+    '<div class="bbtns"><button class="btn pri" id="bgo">확인</button></div></form>';
+  el('bmodal').classList.add('on'); el('bx').onclick=closeB; el('bpw').focus();
+  el('pwf').onsubmit=function(e){
+    e.preventDefault(); var pw=el('bpw').value; el('bgo').disabled=true; el('bmsg').textContent='';
+    api({action:'view',id:id,pw:pw}).then(function(j){
+      if(!j.ok){ el('bmsg').textContent=j.error||'다시 시도해 주세요.'; el('bgo').disabled=false; return; }
+      showPost(j.post,j.role,pw);
+    }).catch(function(){ el('bmsg').textContent='연결이 잠시 안 돼요. 다시 시도해 주세요.'; el('bgo').disabled=false; });
+  };
+}
+function showPost(p,role,pw){
+  var rows=[['교회·기관',p.org],['담당자',p.name],['문의 유형',p.lec],['예상 인원',p.cnt],['희망 날짜',p.date],['회신 연락처',p.tel],['남기실 말씀',p.msg],['작성일',p.created+(p.updated?' (수정 '+p.updated+')':'')]];
+  el('bsheet').innerHTML='<button class="x" id="bx" aria-label="닫기">✕</button><h3>'+esc(p.lec||'문의')+'</h3>'+
+    (role==='admin'?'<p class="bnote">관리자로 보고 있어요.</p>':'')+
+    '<dl>'+rows.map(function(r){return '<dt>'+r[0]+'</dt><dd>'+esc(r[1]||'-')+'</dd>'}).join('')+'</dl>'+
+    '<div class="bbtns">'+(role==='owner'?'<button class="btn pri" id="bedit">수정하기</button>':'')+'<button class="btn ghost" id="bclose">닫기</button></div>';
+  el('bx').onclick=closeB; el('bclose').onclick=closeB;
+  if(role==='owner') el('bedit').onclick=function(){ editPost(p,pw); };
+}
+function editPost(p,pw){
+  var opts=Array.prototype.map.call(el('lecSelect').options,function(o){return o.text});
+  if(opts.indexOf(p.lec)<0) opts.unshift(p.lec);
+  el('bsheet').innerHTML='<button class="x" id="bx" aria-label="닫기">✕</button><h3>문의 고치기</h3><form id="ef">'+
+    '<div class="row2"><div><label>교회·기관 이름</label><input name="org" required value="'+esc(p.org)+'"></div><div><label>담당자 이름</label><input name="name" required value="'+esc(p.name)+'"></div></div>'+
+    '<div class="row2"><div><label>문의 내용</label><select name="lec">'+opts.map(function(o){return '<option'+(o===p.lec?' selected':'')+'>'+esc(o)+'</option>'}).join('')+'</select></div><div><label>예상 인원</label><input name="cnt" value="'+esc(p.cnt)+'"></div></div>'+
+    '<div class="row2"><div><label>희망 날짜</label><input name="date" value="'+esc(p.date)+'"></div><div><label>회신받을 연락처</label><input name="tel" required value="'+esc(p.tel)+'"></div></div>'+
+    '<label>남기실 말씀</label><textarea name="msg">'+esc(p.msg)+'</textarea><div class="bmsg" id="bmsg" role="alert"></div>'+
+    '<div class="bbtns"><button class="btn pri" id="bsave">저장</button><button type="button" class="btn ghost" id="bcancel">취소</button></div></form>';
+  el('bx').onclick=closeB; el('bcancel').onclick=function(){ showPost(p,'owner',pw); };
+  el('ef').onsubmit=function(e){
+    e.preventDefault(); var f=new FormData(this); el('bsave').disabled=true;
+    api({action:'update',id:p.id,pw:pw,org:f.get('org'),name:f.get('name'),lec:f.get('lec'),cnt:f.get('cnt'),date:f.get('date'),tel:f.get('tel'),msg:f.get('msg')}).then(function(j){
+      if(!j.ok){ el('bmsg').textContent=j.error||'다시 시도해 주세요.'; el('bsave').disabled=false; return; }
+      showPost(j.post,'owner',pw); loadBoard(bPage);
+    }).catch(function(){ el('bmsg').textContent='연결이 잠시 안 돼요.'; el('bsave').disabled=false; });
+  };
+}
+loadBoard(1);
+
+// form → 게시판에 등록 + 이메일로 알림
 el('form').addEventListener('submit',function(e){
   e.preventDefault();
   var form=this, f=new FormData(form), btn=el('sendBtn');
@@ -601,18 +705,20 @@ el('form').addEventListener('submit',function(e){
     '예상 인원':f.get('cnt')||'-', '희망 날짜':f.get('date')||'-', '회신 연락처':f.get('tel')||'', '남기실 말씀':f.get('msg')||'-'
   };
   btn.disabled=true; btn.textContent='보내는 중…';
-  fetch('https://formsubmit.co/ajax/nellapark@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)})
-    .then(function(r){return r.json()})
-    .then(function(j){
-      if(j && (j.success===true || j.success==='true')){
-        el('resultTitle').textContent='문의가 전달됐어요. 곧 연락드릴게요!';
-        el('resultText').textContent=data['담당자']+'님, 감사합니다.';
-        form.reset();
-      } else { throw new Error('fail'); }
+  var post=api({action:'create',org:f.get('org'),name:f.get('name'),lec:f.get('lec'),cnt:f.get('cnt'),date:f.get('date'),tel:f.get('tel'),msg:f.get('msg'),pw:f.get('pw')})
+    .then(function(j){ if(!j.ok) throw new Error(j.error||'fail'); return true; });
+  var mail=fetch('https://formsubmit.co/ajax/nellapark@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)})
+    .then(function(r){return r.json()}).then(function(j){ return !!(j && (j.success===true || j.success==='true')); }).catch(function(){return false});
+  post.then(function(){
+      el('resultTitle').textContent='문의가 전달됐어요. 곧 연락드릴게요!';
+      el('resultText').textContent=data['담당자']+'님, 감사합니다. 아래 문의 게시판에서 정하신 비밀번호로 글을 다시 보고 고칠 수 있어요.';
+      form.reset(); loadBoard(1);
     })
-    .catch(function(){
-      el('resultTitle').textContent='전송이 잠시 안 되고 있어요';
-      el('resultText').textContent='nellapark@gmail.com 으로 메일을 보내 주시면 바로 확인할게요.';
+    .catch(function(err){
+      return mail.then(function(ok){
+        el('resultTitle').textContent= ok ? '문의가 메일로 전달됐어요' : '전송이 잠시 안 되고 있어요';
+        el('resultText').textContent= ok ? '게시판 등록은 잠시 안 됐지만, 문의는 잘 받았어요. 곧 연락드릴게요.' : ((err&&err.message&&err.message!=='fail'&&err.message.indexOf('fetch')<0)?err.message+' ':'')+'nellapark@gmail.com 으로 메일을 보내 주시면 바로 확인할게요.';
+      });
     })
     .then(function(){ el('result').classList.add('on'); btn.disabled=false; btn.textContent='문의 보내기'; });
 });
