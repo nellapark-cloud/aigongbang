@@ -511,8 +511,8 @@ footer nav a:hover{color:#fff}
               <div><label>희망 날짜</label><input name="date" placeholder="예: 12월 둘째 주 토요일"></div>
               <div><label>회신받을 연락처</label><input name="tel" required placeholder="전화번호 또는 이메일"></div>
             </div>
-            <label>비밀번호 <span style="font-weight:400;color:var(--sub)">(문의 게시판에서 내 글을 보고 고칠 때 써요)</span></label>
-            <input type="password" name="pw" required minlength="4" maxlength="30" autocomplete="new-password" placeholder="4자 이상">
+            <div id="pwWrap" hidden><label>비밀번호 <span style="font-weight:400;color:var(--sub)">(문의 게시판에서 내 글을 보고 고칠 때 써요)</span></label>
+            <input type="password" name="pw" id="pwInput" minlength="4" maxlength="30" autocomplete="new-password" placeholder="4자 이상"></div>
             <label>남기실 말씀</label>
             <textarea name="msg" placeholder="참석자 연령대, 교회 상황, 만들고 싶은 것, 궁금한 점을 편하게 적어 주세요."></textarea>
             <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
@@ -524,7 +524,7 @@ footer nav a:hover{color:#fff}
           </div>
         </div>
       </div>
-      <div class="board" id="board">
+      <div class="board" id="board" hidden>
         <div class="bhead"><h3>문의 게시판</h3><span>모든 문의는 비밀글이에요. 글쓴이와 공방 대표만 내용을 볼 수 있어요.</span></div>
         <table class="btable">
           <thead><tr><th class="c">번호</th><th>제목</th><th class="w">작성자</th><th class="d">날짜</th></tr></thead>
@@ -628,13 +628,15 @@ el('burger').onclick=function(){ el('gnb').classList.toggle('open'); };
 // 문의 게시판 (구글 시트 + Apps Script)
 var BOARD_API='https://script.google.com/macros/s/AKfycbyexbMjKNcNEDG4jd0XZ7nkXZMhvIduAg0XXBOgDTTBoyCNjLix_yCGJbhkX7XV3WDx5A/exec';
 var LOCK='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
-var bPage=1;
+var bPage=1, BOARD_MIN=10, boardOn=false;
+function setBoard(on){ boardOn=on; el('board').hidden=!on; el('pwWrap').hidden=!on; el('pwInput').required=on; }
 function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function api(body){return fetch(BOARD_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(function(r){return r.json()})}
 function loadBoard(pg){
   bPage=pg||1;
   fetch(BOARD_API+'?page='+bPage).then(function(r){return r.json()}).then(function(j){
     if(!j.ok) throw 0;
+    setBoard(j.total>=BOARD_MIN); if(!boardOn) return;
     var tb=el('blist');
     if(!j.items.length){ tb.innerHTML='<tr><td colspan="4" class="empty">아직 남겨진 문의가 없어요.</td></tr>'; }
     else tb.innerHTML=j.items.map(function(x){
@@ -705,22 +707,22 @@ el('form').addEventListener('submit',function(e){
     '예상 인원':f.get('cnt')||'-', '희망 날짜':f.get('date')||'-', '회신 연락처':f.get('tel')||'', '남기실 말씀':f.get('msg')||'-'
   };
   btn.disabled=true; btn.textContent='보내는 중…';
-  var post=api({action:'create',org:f.get('org'),name:f.get('name'),lec:f.get('lec'),cnt:f.get('cnt'),date:f.get('date'),tel:f.get('tel'),msg:f.get('msg'),pw:f.get('pw')})
-    .then(function(j){ if(!j.ok) throw new Error(j.error||'fail'); return true; });
+  var pw=boardOn ? f.get('pw') : Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);
+  var post=api({action:'create',org:f.get('org'),name:f.get('name'),lec:f.get('lec'),cnt:f.get('cnt'),date:f.get('date'),tel:f.get('tel'),msg:f.get('msg'),pw:pw})
+    .then(function(j){ return !!(j && j.ok); }).catch(function(){ return false; });
   var mail=fetch('https://formsubmit.co/ajax/nellapark@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)})
     .then(function(r){return r.json()}).then(function(j){ return !!(j && (j.success===true || j.success==='true')); }).catch(function(){return false});
-  post.then(function(){
+  Promise.all([mail,post]).then(function(r){
+    if(r[0] || r[1]){
       el('resultTitle').textContent='문의가 전달됐어요. 곧 연락드릴게요!';
-      el('resultText').textContent=data['담당자']+'님, 감사합니다. 아래 문의 게시판에서 정하신 비밀번호로 글을 다시 보고 고칠 수 있어요.';
-      form.reset(); loadBoard(1);
-    })
-    .catch(function(err){
-      return mail.then(function(ok){
-        el('resultTitle').textContent= ok ? '문의가 메일로 전달됐어요' : '전송이 잠시 안 되고 있어요';
-        el('resultText').textContent= ok ? '게시판 등록은 잠시 안 됐지만, 문의는 잘 받았어요. 곧 연락드릴게요.' : ((err&&err.message&&err.message!=='fail'&&err.message.indexOf('fetch')<0)?err.message+' ':'')+'nellapark@gmail.com 으로 메일을 보내 주시면 바로 확인할게요.';
-      });
-    })
-    .then(function(){ el('result').classList.add('on'); btn.disabled=false; btn.textContent='문의 보내기'; });
+      el('resultText').textContent=data['담당자']+'님, 감사합니다.'+(boardOn && r[1] ? ' 아래 문의 게시판에서 정하신 비밀번호로 글을 다시 보고 고칠 수 있어요.' : '');
+      form.reset(); if(r[1]) loadBoard(1);
+    } else {
+      el('resultTitle').textContent='전송이 잠시 안 되고 있어요';
+      el('resultText').textContent='nellapark@gmail.com 으로 메일을 보내 주시면 바로 확인할게요.';
+    }
+    el('result').classList.add('on'); btn.disabled=false; btn.textContent='문의 보내기';
+  });
 });
 </script>
 </body>
