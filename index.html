@@ -207,6 +207,10 @@ form textarea{min-height:110px;resize:vertical}
 .notice>b{display:block;color:var(--navy);font-size:15px;margin-bottom:6px}
 .notice li{font-size:14px}
 .notice strong{color:var(--navy)}
+.visits{margin-top:22px;display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 16px;background:rgba(255,255,255,.75);border:1px solid var(--line);border-radius:999px;padding:8px 18px;font-size:13.5px;color:var(--sub)}
+.visits b{color:var(--navy);font-weight:800;margin-left:3px}
+.visits .vt{display:inline-flex;align-items:center;gap:7px;font-weight:700;color:var(--blue)}
+.visits .vt i{width:7px;height:7px;border-radius:50%;background:#3fb27f;box-shadow:0 0 0 3px rgba(63,178,127,.18)}
 .info li b{display:block;color:var(--navy);font-size:13px;margin-bottom:2px}
 
 footer{background:var(--navy);color:#b9c8dc;padding:46px 0;font-size:13.5px}
@@ -273,6 +277,12 @@ footer nav a:hover{color:#fff}
         <div class="btns">
           <a href="#lectures" class="btn pri">강의 둘러보기 →</a>
           <a href="#contact" class="btn ghost">강의 또는 제작 문의하기</a>
+        </div>
+        <div class="visits" id="visits" aria-label="방문자 수">
+          <span class="vt"><i></i>방문자</span>
+          <span>오늘 <b id="vDay">·</b></span>
+          <span>이번 주 <b id="vWeek">·</b></span>
+          <span>이번 달 <b id="vMonth">·</b></span>
         </div>
       </div>
       <div class="art" aria-hidden="true">
@@ -623,10 +633,30 @@ function route(){
 window.addEventListener('hashchange',route); route();
 el('burger').onclick=function(){ el('gnb').classList.toggle('open'); };
 
+// 방문자 수 (오늘 · 이번 주 · 이번 달, 한국 시간 기준, 기기당 기간별 1회)
+(function(){
+  var API='https://abacus.jasoncameron.dev', NS='aigongbang-kr';
+  var k=new Date(Date.now()+9*3600*1000);
+  var y=k.getUTCFullYear(), mo=k.getUTCMonth()+1, d=k.getUTCDate();
+  function p(n){ return String(n).padStart(2,'0'); }
+  var t=new Date(Date.UTC(y,mo-1,d)), wd=(t.getUTCDay()+6)%7; t.setUTCDate(t.getUTCDate()-wd+3);
+  var fy=t.getUTCFullYear(), wk=1+Math.floor((t-Date.UTC(fy,0,1))/864e5/7);
+  var keys={vDay:'d'+y+p(mo)+p(d), vWeek:'w'+fy+'w'+p(wk), vMonth:'m'+y+p(mo)};
+  function seen(key){ try{ return localStorage.getItem('ag_v_'+key)==='1'; }catch(e){ return false; } }
+  function mark(key){ try{ localStorage.setItem('ag_v_'+key,'1'); }catch(e){} }
+  Object.keys(keys).forEach(function(id){
+    var key=keys[id], hit=!seen(key);
+    fetch(API+'/'+(hit?'hit':'get')+'/'+NS+'/'+key)
+      .then(function(r){ return r.ok ? r.json() : {value:0}; })
+      .then(function(j){ if(hit) mark(key); el(id).textContent=(j && j.value ? j.value : 0).toLocaleString('ko-KR'); })
+      .catch(function(){ el(id).textContent='-'; });
+  });
+})();
+
 // 문의 게시판 (구글 시트 + Apps Script)
 var BOARD_API='https://script.google.com/macros/s/AKfycbyexbMjKNcNEDG4jd0XZ7nkXZMhvIduAg0XXBOgDTTBoyCNjLix_yCGJbhkX7XV3WDx5A/exec';
 var LOCK='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
-var bPage=1, BOARD_MIN=10, boardOn=false;
+var bPage=1, BOARD_MIN=0, boardOn=false;
 function setBoard(on){ boardOn=on; el('board').hidden=!on; el('pwWrap').hidden=!on; el('pwInput').required=on; }
 function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function api(body){return fetch(BOARD_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(function(r){return r.json()})}
