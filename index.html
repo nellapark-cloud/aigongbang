@@ -137,6 +137,13 @@ h2{font-size:clamp(25px,3.6vw,34px);color:var(--navy);font-weight:800;letter-spa
 .wk{cursor:pointer;transition:.2s;color:inherit}
 .wk:hover{border-color:var(--sky2);transform:translateY(-3px);box-shadow:0 12px 26px rgba(28,47,79,.06)}
 .lockb{position:absolute;top:12px;right:12px;font-size:11.5px;font-weight:700;background:#fff;color:var(--navy);padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
+.work .th.shot{background:linear-gradient(135deg,#2b2620,#171511);overflow:hidden;place-items:start center}
+.work .th.shot img{width:62%;max-width:190px;margin-top:16px;border-radius:14px 14px 0 0;box-shadow:0 10px 24px rgba(0,0,0,.35);display:block}
+.shots{display:flex;gap:12px;overflow-x:auto;margin:20px -4px 0;padding:4px 4px 8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.shots figure{flex:1 1 0;min-width:140px;max-width:230px;margin:0;scroll-snap-align:start}
+.shots img{width:100%;display:block;border-radius:16px;box-shadow:0 8px 22px rgba(28,47,79,.16)}
+.shots figcaption{text-align:center;font-size:12.5px;color:var(--sub);margin-top:8px;font-weight:700}
+.shotnote{font-size:12.5px;color:var(--sub);margin-top:6px}
 .work .th svg{width:48px;height:48px;stroke:var(--navy);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
 .work .bd{padding:20px 22px 24px}
 .work .c{font-size:12px;font-weight:800;color:var(--blue);margin-bottom:4px}
@@ -415,7 +422,7 @@ footer nav a:hover{color:#fff}
     <div class="wrap">
       <div class="eyebrow">Portfolio</div>
       <h2>AI와 함께 만든 것들</h2>
-      <p class="desc">모두 지금 실제로 쓰이고 있는 결과물이에요. 카드를 누르면 열어 보실 수 있어요. 재정이나 출석처럼 성도 정보가 담긴 결과물은 공개하지 않고, 문의를 주시면 시연으로 보여 드립니다.</p>
+      <p class="desc">모두 지금 실제로 쓰이고 있는 결과물이에요. 카드를 누르면 열어 보실 수 있어요. 출석 앱은 예시 화면으로 소개하고, 재정처럼 성도 정보가 담긴 결과물은 문의를 주시면 시연으로 보여 드립니다.</p>
       <div class="g3" id="workList"></div>
     </div>
   </section>
@@ -570,7 +577,11 @@ var WORK=[
  {c:"웹사이트",k:"c5",u:"https://givenministry.com/",t:"GIVEN MINISTRY 사이트",d:"여러 교회가 함께하는 문화사역 공동체의 9페이지 사이트. 팀 소개, 연혁, 프로젝트를 담았습니다.",i:'<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5"/><path d="M11 20c0-3 2.5-5 5-5s5 2 5 5"/>'},
  {c:"웹사이트",k:"c2",u:"https://nellapark-cloud.github.io/grace-worship/",t:"그레이스워십 랜딩페이지",d:"찬양팀 소개, 사역, 유튜브 영상을 담은 한 페이지 사이트입니다.",i:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'},
  {c:"웹사이트",k:"c4",u:"#home",t:"대니의 AI 공방 (이 사이트)",d:"지금 보고 계신 강사 홈페이지예요. 기획, 디자인, 문의 양식, 도메인 연결, 검색 등록까지 AI와 함께 하루 만에 만들었습니다.",i:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/>'},
- {c:"업무 앱",k:"c4",lock:1,t:"출석 관리 앱",d:"휴대폰으로 체크하면 구글 시트에 바로 쌓이는 출석 앱입니다.",i:'<rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16"/><path d="m9 15 2 2 4-4"/>'},
+ {c:"업무 앱",k:"c4",demo:1,img:"img/attendance-check.webp",t:"출석 관리 앱",d:"휴대폰으로 체크하면 구글 시트에 바로 쌓이는 출석 앱입니다.",
+  shots:[["img/attendance-check.webp","출석 체크"],["img/attendance-stats.webp","출석 통계"],["img/attendance-settings.webp","설정"]],
+  intro:"예배와 모임마다 이름을 한 번 누르면 출석이 체크되는 휴대폰 앱이에요. 목회자와 섬기는 분들이 각자 휴대폰으로 체크해도 구글 시트에 함께 저장되어, 어느 기기에서 열어도 같은 출석부를 봅니다.",
+  feats:["이름을 누르면 출석, 한 번 더 누르면 결석 — 위쪽 원에 오늘 출석 인원이 바로 보여요","주일예배·수요성경·금요기도처럼 모임별로 따로 체크하고, 달력으로 지난 날짜도 고칠 수 있어요","통계에서 주별·월별·연별 출석 인원과 교인별 출석률을 그래프로 봅니다","설정에서 출석체크 목록(모임)을 추가·수정·삭제하고 순서를 바꿔요 — 이름을 바꿔도 지난 기록은 그대로","홈 화면에 앱처럼 추가해 쓰고, 모든 기기와 실시간으로 공유돼요"],
+  made:"구글 시트와 앱스 스크립트로 저장소를 만들고, 필요한 기능을 말로 설명해 하나씩 더해 갔어요. 코딩 지식 없이 실제 교회에서 매주 쓰고 있습니다.",i:'<rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16"/><path d="m9 15 2 2 4-4"/>'},
  {c:"업무 앱",k:"c3",lock:1,t:"재정기록부",d:"장부, 영수증 첨부, 통계, 기부금영수증 발급, 회원 승인까지. 다른 교회용 서비스로 확장을 준비하고 있습니다.",i:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/>'},
  {c:"업무 앱",k:"c1",lock:1,t:"행정 서식과 행사 큐시트",d:"기부금영수증, 경력증명서, 추천서, 재적증명서를 화면에서 입력하고 PDF로 저장합니다.",i:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h5"/>'},
  {c:"교육 콘텐츠",k:"c3",u:"https://sejonggrace.com/archive.html",t:"성경 세부 강해 시리즈",d:"로마서 전권과 에베소서, 빌립보서, 사사기, 학개, 요한계시록을 절별로 풀었습니다.",i:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>'},
@@ -581,8 +592,10 @@ function lecCard(x){return '<div class="card lec" data-n="'+x.n+'" data-lv="'+x.
 el('lecList').innerHTML = LEC.map(lecCard).join('');
 el('homeLec').innerHTML = [LEC[0],LEC[1],LEC[3]].map(lecCard).join('');
 el('workList').innerHTML = WORK.map(function(w,n){
-  var inner='<div class="th '+w.k+'"><svg viewBox="0 0 24 24">'+w.i+'</svg>'+(w.lock?'<span class="lockb">문의 시 공개</span>':'')+'</div><div class="bd"><div class="c">'+w.c+'</div><h3>'+w.t+'</h3><p>'+w.d+'</p><div class="more">'+(w.lock?'시연 안내 보기 →':(w.u.charAt(0)==='#'?'처음 화면으로 →':'사이트 열기 ↗'))+'</div></div>';
-  if(w.lock) return '<div class="card work wk" data-w="'+n+'" role="button" tabindex="0">'+inner+'</div>';
+  var thumb = w.img ? '<img src="'+w.img+'" alt="'+w.t+' 예시 화면" loading="lazy">' : '<svg viewBox="0 0 24 24">'+w.i+'</svg>';
+  var badge = w.lock?'<span class="lockb">문의 시 공개</span>':(w.demo?'<span class="lockb">예시 화면</span>':'');
+  var inner='<div class="th '+w.k+(w.img?' shot':'')+'">'+thumb+badge+'</div><div class="bd"><div class="c">'+w.c+'</div><h3>'+w.t+'</h3><p>'+w.d+'</p><div class="more">'+(w.lock?'시연 안내 보기 →':w.demo?'앱 소개 보기 →':(w.u.charAt(0)==='#'?'처음 화면으로 →':'사이트 열기 ↗'))+'</div></div>';
+  if(w.lock||w.demo) return '<div class="card work wk" data-w="'+n+'" role="button" tabindex="0">'+inner+'</div>';
   return '<a class="card work wk" href="'+w.u+'"'+(w.u.charAt(0)==='#'?'':' target="_blank" rel="noopener"')+'>'+inner+'</a>';
 }).join('');
 function openLock(w){
@@ -591,8 +604,18 @@ function openLock(w){
    '<a href="#contact" class="btn pri" id="ask2" style="margin-top:22px">시연 문의하기 →</a>';
   el('modal').classList.add('on'); el('x').onclick=closeM; el('ask2').onclick=closeM;
 }
-el('workList').addEventListener('click',function(e){ var c=e.target.closest('[data-w]'); if(c) openLock(WORK[+c.dataset.w]); });
-el('workList').addEventListener('keydown',function(e){ var c=e.target.closest('[data-w]'); if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault(); openLock(WORK[+c.dataset.w]);} });
+function openDemo(w){
+  el('sheet').innerHTML='<button class="x" id="x">✕</button><div class="eyebrow">'+w.c+'</div><h3>'+w.t+'</h3><p style="font-size:14.5px;color:var(--sub);margin-top:8px">'+w.intro+'</p>'+
+   '<div class="shots">'+w.shots.map(function(s){return '<figure><a href="'+s[0]+'" target="_blank" rel="noopener"><img src="'+s[0]+'" alt="'+w.t+' — '+s[1]+' 화면" loading="lazy"></a><figcaption>'+s[1]+'</figcaption></figure>'}).join('')+'</div>'+
+   '<p class="shotnote">예시 이름과 숫자로 만든 화면이에요. 실제 성도 정보는 공개하지 않습니다.</p>'+
+   '<h4>이런 일을 해요</h4><ul class="dot">'+w.feats.map(function(s){return '<li>'+s+'</li>'}).join('')+'</ul>'+
+   '<h4>어떻게 만들었나요</h4><p style="font-size:14.5px">'+w.made+'</p>'+
+   '<a href="#contact" class="btn pri" id="ask2" style="margin-top:22px">우리 교회 출석 앱 문의하기 →</a>';
+  el('modal').classList.add('on'); el('sheet').scrollTop=0; el('x').onclick=closeM; el('ask2').onclick=closeM;
+}
+function openWork(w){ if(w.demo) openDemo(w); else openLock(w); }
+el('workList').addEventListener('click',function(e){ var c=e.target.closest('[data-w]'); if(c) openWork(WORK[+c.dataset.w]); });
+el('workList').addEventListener('keydown',function(e){ var c=e.target.closest('[data-w]'); if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault(); openWork(WORK[+c.dataset.w]);} });
 el('lecSelect').innerHTML += LEC.map(function(x){return '<option>'+x.n+'강 · '+x.t+'</option>'}).join('');
 
 // lecture filter
