@@ -246,6 +246,14 @@ form textarea{min-height:110px;resize:vertical}
 .gblist .empty{grid-column:1/-1;text-align:center;color:var(--sub);background:transparent;border:1px dashed var(--line)}
 @media(max-width:900px){.gb{grid-template-columns:1fr}}
 @media(max-width:600px){.gblist{grid-template-columns:1fr}}
+.gbbtn em{font-style:normal;background:#c39a4c;color:#fff;font-size:11.5px;font-weight:800;min-width:20px;height:20px;border-radius:10px;display:inline-grid;place-items:center;padding:0 6px}
+.cheerstrip{display:flex;align-items:center;gap:12px;margin-top:14px;max-width:560px;background:#fff;border:1px solid #ecdcb8;border-radius:14px;padding:10px 14px;box-shadow:0 6px 16px rgba(195,154,76,.10);color:var(--ink)}
+.cs-label{flex:none;font-size:12px;font-weight:800;color:#8d6a2c;background:#f5eedf;padding:3px 9px;border-radius:999px}
+.cs-viewport{flex:1;min-width:0;overflow:hidden}
+.cs-item{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-item b{color:var(--navy);margin-right:4px}
+.cs-item.in{animation:csin .5s ease}
+@keyframes csin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .gbbtn{display:inline-flex;align-items:center;gap:6px;margin:22px 0 0 8px;padding:8px 16px;border-radius:999px;background:linear-gradient(135deg,#f5eedf,#fff6e3);border:1px solid #e8d6ae;color:#7a5a22;font-size:13.5px;font-weight:800;vertical-align:top;transition:.2s}
 .gbbtn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(195,154,76,.22)}
 .gbbtn span{transition:.2s}
@@ -328,7 +336,11 @@ footer nav a:hover{color:#fff}
           <span>이번 주 <b id="vWeek">·</b></span>
           <span>이번 달 <b id="vMonth">·</b></span>
         </div>
-        <a href="#guestbook" class="gbbtn">응원·후기 남기기 <span>→</span></a>
+        <a href="#guestbook" class="gbbtn">응원·후기 남기기 <em id="gbBadge" style="display:none"></em><span>→</span></a>
+        <a href="#guestbook" class="cheerstrip" id="cheerStrip" style="display:none" aria-label="최근 응원과 방문 후기">
+          <span class="cs-label">최근 응원·후기</span>
+          <span class="cs-viewport"><span class="cs-item" id="csItem"></span></span>
+        </a>
       </div>
       <div class="art" aria-hidden="true">
         <svg viewBox="0 0 400 400">
@@ -898,10 +910,26 @@ el('form').addEventListener('submit',function(e){
     }).join('') : '<li class="empty">첫 번째 '+(filt==='후기'?'방문 후기':'응원 메시지')+'를 남겨 주세요!</li>';
     el('gbMore').style.display = list.length>shown ? '' : 'none';
   }
+  var sIdx=0, sTimer=null;
+  function strip(){
+    var box=el('cheerStrip'), badge=el('gbBadge');
+    if(!items.length){ box.style.display='none'; badge.style.display='none'; return; }
+    badge.textContent=items.length; badge.style.display='';
+    box.style.display='flex';
+    var recent=items.slice(0,10);
+    function showOne(){
+      var x=recent[sIdx%recent.length], it=el('csItem');
+      it.classList.remove('in'); void it.offsetWidth;
+      it.innerHTML='<b>'+esc(x.name)+'</b> '+esc(x.msg);
+      it.classList.add('in'); sIdx++;
+    }
+    clearInterval(sTimer); sIdx=0; showOne();
+    if(recent.length>1) sTimer=setInterval(showOne,4500);
+  }
   function load(){
     return fetch(BOARD_API+'?gb=1').then(function(r){return r.json()}).then(function(j){
       if(!j || !j.ok || !j.gb) throw 0;
-      items=j.items||[]; draw();
+      items=j.items||[]; draw(); strip();
     });
   }
   load().catch(function(){ el('gbList').innerHTML='<li class="empty">글을 불러오지 못했어요. 잠시 후 다시 들어와 주세요.</li>'; });
