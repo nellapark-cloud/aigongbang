@@ -246,6 +246,11 @@ form textarea{min-height:110px;resize:vertical}
 .gblist .empty{grid-column:1/-1;text-align:center;color:var(--sub);background:transparent;border:1px dashed var(--line)}
 @media(max-width:900px){.gb{grid-template-columns:1fr}}
 @media(max-width:600px){.gblist{grid-template-columns:1fr}}
+.gbbtn{display:inline-flex;align-items:center;gap:6px;margin:22px 0 0 8px;padding:8px 16px;border-radius:999px;background:linear-gradient(135deg,#f5eedf,#fff6e3);border:1px solid #e8d6ae;color:#7a5a22;font-size:13.5px;font-weight:800;vertical-align:top;transition:.2s}
+.gbbtn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(195,154,76,.22)}
+.gbbtn span{transition:.2s}
+.gbbtn:hover span{transform:translateX(3px)}
+@media(max-width:600px){.gbbtn{margin-left:0}}
 .visits{margin-top:22px;display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 16px;background:rgba(255,255,255,.75);border:1px solid var(--line);border-radius:999px;padding:8px 18px;font-size:13.5px;color:var(--sub)}
 .visits b{color:var(--navy);font-weight:800;margin-left:3px}
 .visits .vt{display:inline-flex;align-items:center;gap:7px;font-weight:700;color:var(--blue)}
@@ -323,6 +328,7 @@ footer nav a:hover{color:#fff}
           <span>이번 주 <b id="vWeek">·</b></span>
           <span>이번 달 <b id="vMonth">·</b></span>
         </div>
+        <a href="#guestbook" class="gbbtn">응원·후기 남기기 <span>→</span></a>
       </div>
       <div class="art" aria-hidden="true">
         <svg viewBox="0 0 400 400">
@@ -384,8 +390,20 @@ footer nav a:hover{color:#fff}
     </div>
   </section>
 
-  <section class="soft" id="cheer" hidden>
+  <section>
+    <div class="wrap quote">
+      <div class="eyebrow">Philosophy</div>
+      <p style="margin-top:16px">"AI는 아는 것을 줄 수 있지만,<br>곁에 있어 주지는 못합니다.<br>도구는 맡기고, 사람과 고백은 지킵니다."</p>
+      <small>박동준 · 대니의 AI 공방 대표</small>
+    </div>
+  </section>
+</main>
+
+<!-- GUESTBOOK -->
+<main class="page" id="p-guestbook">
+  <section id="cheer">
     <div class="wrap">
+      <a href="#home" style="display:inline-block;font-size:13.5px;color:var(--sub);margin-bottom:18px">← 처음 화면으로</a>
       <div class="eyebrow">Guestbook</div>
       <h2>응원과 방문 후기</h2>
       <p class="desc">2027년 문을 열기 전, 응원의 한마디나 짧은 방문 후기를 남겨 주세요. 공방을 준비하는 데 큰 힘이 됩니다.</p>
@@ -412,13 +430,6 @@ footer nav a:hover{color:#fff}
     </div>
   </section>
 
-  <section>
-    <div class="wrap quote">
-      <div class="eyebrow">Philosophy</div>
-      <p style="margin-top:16px">"AI는 아는 것을 줄 수 있지만,<br>곁에 있어 주지는 못합니다.<br>도구는 맡기고, 사람과 고백은 지킵니다."</p>
-      <small>박동준 · 대니의 AI 공방 대표</small>
-    </div>
-  </section>
 </main>
 
 <!-- ABOUT -->
@@ -734,7 +745,7 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeM(); 
 document.addEventListener('click',function(e){ var c=e.target.closest('.lec'); if(c) openLec(c.dataset.n); });
 
 // router
-var pages=['home','about','lectures','portfolio','process','contact'];
+var pages=['home','about','lectures','portfolio','process','contact','guestbook'];
 function route(){
   var p=(location.hash||'').replace('#','');
   if(pages.indexOf(p)<0) p='home';
@@ -880,10 +891,10 @@ el('form').addEventListener('submit',function(e){
   function load(){
     return fetch(BOARD_API+'?gb=1').then(function(r){return r.json()}).then(function(j){
       if(!j || !j.ok || !j.gb) throw 0;
-      items=j.items||[]; el('cheer').hidden=false; draw();
+      items=j.items||[]; draw();
     });
   }
-  load().catch(function(){ el('cheer').hidden=true; });
+  load().catch(function(){ el('gbList').innerHTML='<li class="empty">글을 불러오지 못했어요. 잠시 후 다시 들어와 주세요.</li>'; });
   el('gbTabs').addEventListener('click',function(e){
     var b=e.target.closest('button'); if(!b) return;
     this.querySelectorAll('button').forEach(function(x){x.classList.remove('on')}); b.classList.add('on');
