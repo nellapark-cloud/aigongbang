@@ -217,6 +217,35 @@ form textarea{min-height:110px;resize:vertical}
 .notice>b{display:block;color:var(--navy);font-size:15px;margin-bottom:6px}
 .notice li{font-size:14px}
 .notice strong{color:var(--navy)}
+.gb{display:grid;grid-template-columns:.9fr 1.1fr;gap:20px;align-items:start}
+.gbform label{display:block;font-size:13.5px;font-weight:700;color:var(--navy);margin:14px 0 6px}
+.gbform input[type=text],.gbform input:not([type]),.gbform textarea{width:100%;font-family:inherit;font-size:15px;border:1px solid var(--line);border-radius:11px;padding:11px 13px;outline:none}
+.gbform textarea{min-height:96px;resize:vertical}
+.gbform input:focus,.gbform textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--sky)}
+.gbkind{display:flex;gap:8px}
+.gbkind label{margin:0;flex:1}
+.gbkind input{display:none}
+.gbkind span{display:block;text-align:center;padding:9px 0;border:1px solid var(--line);border-radius:11px;font-weight:700;color:var(--sub);cursor:pointer;background:#fff}
+.gbkind input:checked+span{background:var(--navy);border-color:var(--navy);color:#fff}
+.gbcount{float:right;font-weight:500;color:var(--sub);font-size:12.5px}
+.gbnote{font-size:12.5px;color:var(--sub);margin-top:10px}
+.gbtabs{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.gbtabs button{font-family:inherit;font-size:13px;border:1px solid var(--line);background:#fff;color:var(--sub);padding:6px 13px;border-radius:999px;cursor:pointer}
+.gbtabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.gbtabs span{margin-left:auto;font-size:13px;color:var(--sub)}
+.gblist{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gblist li{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 16px 14px;position:relative}
+.gblist li.k-응원{background:linear-gradient(160deg,#fffaf0,#fff)}
+.gblist li.k-후기{background:linear-gradient(160deg,#eef6fd,#fff)}
+.gblist .tag{font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:999px}
+.gblist .k-응원 .tag{background:#f5eedf;color:#8d6a2c}
+.gblist .k-후기 .tag{background:var(--sky);color:var(--navy)}
+.gblist p{font-size:14.5px;margin:9px 0 10px;white-space:pre-wrap;word-break:break-word}
+.gblist .meta{font-size:12.5px;color:var(--sub);display:flex;justify-content:space-between}
+.gblist .meta b{color:var(--navy)}
+.gblist .empty{grid-column:1/-1;text-align:center;color:var(--sub);background:transparent;border:1px dashed var(--line)}
+@media(max-width:900px){.gb{grid-template-columns:1fr}}
+@media(max-width:600px){.gblist{grid-template-columns:1fr}}
 .visits{margin-top:22px;display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 16px;background:rgba(255,255,255,.75);border:1px solid var(--line);border-radius:999px;padding:8px 18px;font-size:13.5px;color:var(--sub)}
 .visits b{color:var(--navy);font-weight:800;margin-left:3px}
 .visits .vt{display:inline-flex;align-items:center;gap:7px;font-weight:700;color:var(--blue)}
@@ -352,6 +381,34 @@ footer nav a:hover{color:#fff}
       <p class="desc">처음이라면 1강부터 시작하시길 권해 드려요.</p>
       <div class="g3" id="homeLec"></div>
       <div style="margin-top:26px"><a href="#lectures" class="btn ghost">전체 강의 보기 →</a></div>
+    </div>
+  </section>
+
+  <section class="soft" id="cheer" hidden>
+    <div class="wrap">
+      <div class="eyebrow">Guestbook</div>
+      <h2>응원과 방문 후기</h2>
+      <p class="desc">2027년 문을 열기 전, 응원의 한마디나 짧은 방문 후기를 남겨 주세요. 공방을 준비하는 데 큰 힘이 됩니다.</p>
+      <div class="gb">
+        <form class="card gbform" id="gbForm" autocomplete="off">
+          <div class="gbkind" role="radiogroup" aria-label="글 종류">
+            <label><input type="radio" name="kind" value="응원" checked><span>응원 메시지</span></label>
+            <label><input type="radio" name="kind" value="후기"><span>방문 후기</span></label>
+          </div>
+          <label for="gbName">이름 또는 별명</label>
+          <input id="gbName" name="name" required maxlength="12" placeholder="예: 세종의 김집사">
+          <label for="gbMsg">한마디 <span class="gbcount" id="gbCount">0/100</span></label>
+          <textarea id="gbMsg" name="msg" required maxlength="100" placeholder="예: 작은 교회에 꼭 필요한 공방이에요. 응원합니다!"></textarea>
+          <input type="text" name="_hp" style="display:none" tabindex="-1" autocomplete="off">
+          <button class="btn pri" id="gbBtn" style="width:100%;justify-content:center;margin-top:14px">남기기</button>
+          <p class="gbnote" id="gbNote">남긴 글은 모두에게 보여요. 연락처 같은 개인정보는 적지 말아 주세요.</p>
+        </form>
+        <div class="gbwall">
+          <div class="gbtabs" id="gbTabs"><button class="on" data-f="">전체</button><button data-f="응원">응원</button><button data-f="후기">후기</button><span id="gbTotal"></span></div>
+          <ul class="gblist" id="gbList"></ul>
+          <button class="btn ghost" id="gbMore" hidden style="margin-top:12px">더 보기</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -808,6 +865,51 @@ el('form').addEventListener('submit',function(e){
     el('result').classList.add('on'); btn.disabled=false; btn.textContent='문의 보내기';
   });
 });
+
+// 응원 메시지 · 방문 후기 (구글 시트 + Apps Script)
+(function(){
+  var items=[], filt='', shown=8;
+  function draw(){
+    var list=items.filter(function(x){ return !filt || x.kind===filt; });
+    el('gbTotal').textContent='모두 '+items.length+'개';
+    el('gbList').innerHTML = list.length ? list.slice(0,shown).map(function(x){
+      return '<li class="k-'+esc(x.kind)+'"><span class="tag">'+(x.kind==='후기'?'방문 후기':'응원')+'</span><p>'+esc(x.msg)+'</p><div class="meta"><b>'+esc(x.name)+'</b><span>'+esc(x.at)+'</span></div></li>';
+    }).join('') : '<li class="empty">첫 번째 '+(filt==='후기'?'방문 후기':'응원 메시지')+'를 남겨 주세요!</li>';
+    el('gbMore').hidden = list.length<=shown;
+  }
+  function load(){
+    return fetch(BOARD_API+'?gb=1').then(function(r){return r.json()}).then(function(j){
+      if(!j || !j.ok || !j.gb) throw 0;
+      items=j.items||[]; el('cheer').hidden=false; draw();
+    });
+  }
+  load().catch(function(){ el('cheer').hidden=true; });
+  el('gbTabs').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    this.querySelectorAll('button').forEach(function(x){x.classList.remove('on')}); b.classList.add('on');
+    filt=b.dataset.f; shown=8; draw();
+  });
+  el('gbMore').onclick=function(){ shown+=8; draw(); };
+  el('gbMsg').addEventListener('input',function(){ el('gbCount').textContent=this.value.length+'/100'; });
+  el('gbForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var f=new FormData(this), btn=el('gbBtn'), form=this;
+    if(f.get('_hp')) return;
+    var last=0; try{ last=+localStorage.getItem('ag_gb_last')||0; }catch(err){}
+    if(Date.now()-last<60000){ el('gbNote').textContent='잠시 후 다시 남겨 주세요. (1분에 한 번)'; return; }
+    btn.disabled=true; btn.textContent='남기는 중…';
+    api({action:'gb_create',kind:f.get('kind'),name:String(f.get('name')).trim().slice(0,12),msg:String(f.get('msg')).trim().slice(0,100)})
+      .then(function(j){
+        if(!j || !j.ok) throw 0;
+        try{ localStorage.setItem('ag_gb_last',String(Date.now())); }catch(err){}
+        form.reset(); el('gbCount').textContent='0/100';
+        el('gbNote').textContent='고맙습니다! 남겨 주신 마음이 큰 힘이 돼요.';
+        return load();
+      })
+      .catch(function(){ el('gbNote').textContent='잠시 저장이 안 되고 있어요. 조금 뒤에 다시 시도해 주세요.'; })
+      .then(function(){ btn.disabled=false; btn.textContent='남기기'; });
+  });
+})();
 </script>
 </body>
 </html>
