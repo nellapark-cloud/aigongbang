@@ -406,7 +406,7 @@ footer nav a:hover{color:#fff}
         <div class="gbwall">
           <div class="gbtabs" id="gbTabs"><button class="on" data-f="">전체</button><button data-f="응원">응원</button><button data-f="후기">후기</button><span id="gbTotal"></span></div>
           <ul class="gblist" id="gbList"></ul>
-          <button class="btn ghost" id="gbMore" hidden style="margin-top:12px">더 보기</button>
+          <button class="btn ghost" id="gbMore" style="margin-top:12px;display:none">더 보기</button>
         </div>
       </div>
     </div>
@@ -875,7 +875,7 @@ el('form').addEventListener('submit',function(e){
     el('gbList').innerHTML = list.length ? list.slice(0,shown).map(function(x){
       return '<li class="k-'+esc(x.kind)+'"><span class="tag">'+(x.kind==='후기'?'방문 후기':'응원')+'</span><p>'+esc(x.msg)+'</p><div class="meta"><b>'+esc(x.name)+'</b><span>'+esc(x.at)+'</span></div></li>';
     }).join('') : '<li class="empty">첫 번째 '+(filt==='후기'?'방문 후기':'응원 메시지')+'를 남겨 주세요!</li>';
-    el('gbMore').hidden = list.length<=shown;
+    el('gbMore').style.display = list.length>shown ? '' : 'none';
   }
   function load(){
     return fetch(BOARD_API+'?gb=1').then(function(r){return r.json()}).then(function(j){
