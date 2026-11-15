@@ -757,24 +757,34 @@ function route(){
 window.addEventListener('hashchange',route); route();
 el('burger').onclick=function(){ el('gnb').classList.toggle('open'); };
 
-// 방문자 수 (오늘 · 이번 주 · 이번 달, 한국 시간 기준, 기기당 기간별 1회)
+// 방문자 수 (오늘 · 이번 주 · 이번 달, 한국 시간 기준, 기기당 기간별 1회) — 공방 서버(구글 Apps Script)에 저장
 (function(){
-  var API='https://abacus.jasoncameron.dev', NS='aigongbang-kr';
+  var API='https://script.google.com/macros/s/AKfycbyexbMjKNcNEDG4jd0XZ7nkXZMhvIduAg0XXBOgDTTBoyCNjLix_yCGJbhkX7XV3WDx5A/exec';
   var k=new Date(Date.now()+9*3600*1000);
   var y=k.getUTCFullYear(), mo=k.getUTCMonth()+1, d=k.getUTCDate();
   function p(n){ return String(n).padStart(2,'0'); }
   var t=new Date(Date.UTC(y,mo-1,d)), wd=(t.getUTCDay()+6)%7; t.setUTCDate(t.getUTCDate()-wd+3);
   var fy=t.getUTCFullYear(), wk=1+Math.floor((t-Date.UTC(fy,0,1))/864e5/7);
-  var keys={vDay:'d'+y+p(mo)+p(d), vWeek:'w'+fy+'w'+p(wk), vMonth:'m'+y+p(mo)};
-  function seen(key){ try{ return localStorage.getItem('ag_v_'+key)==='1'; }catch(e){ return false; } }
-  function mark(key){ try{ localStorage.setItem('ag_v_'+key,'1'); }catch(e){} }
-  Object.keys(keys).forEach(function(id){
-    var key=keys[id], hit=!seen(key);
-    fetch(API+'/'+(hit?'hit':'get')+'/'+NS+'/'+key)
-      .then(function(r){ return r.ok ? r.json() : {value:0}; })
-      .then(function(j){ if(hit) mark(key); el(id).textContent=(j && j.value ? j.value : 0).toLocaleString('ko-KR'); })
-      .catch(function(){ el(id).textContent='-'; });
-  });
+  var keys={d:'d'+y+p(mo)+p(d), w:'w'+fy+'w'+p(wk), m:'m'+y+p(mo)};
+  function get(n){ try{ return localStorage.getItem(n); }catch(e){ return null; } }
+  function set(n,v){ try{ localStorage.setItem(n,v); }catch(e){} }
+  var hit=['d','w','m'].filter(function(s){ return get('ag_v_'+keys[s])!=='1'; }).join('');
+  var cache={}; try{ cache=JSON.parse(get('ag_vc')||'{}'); }catch(e){}
+  function show(day,week,month){
+    el('vDay').textContent=day==null?'-':Number(day).toLocaleString('ko-KR');
+    el('vWeek').textContent=week==null?'-':Number(week).toLocaleString('ko-KR');
+    el('vMonth').textContent=month==null?'-':Number(month).toLocaleString('ko-KR');
+  }
+  show(cache[keys.d],cache[keys.w],cache[keys.m]);
+  function go(tries){
+    fetch(API+'?vc=1&hit='+hit).then(function(r){ return r.json(); }).then(function(j){
+      if(!j || !j.vc) throw 0;
+      hit.split('').forEach(function(s){ set('ag_v_'+keys[s],'1'); });
+      var c={}; c[keys.d]=j.day; c[keys.w]=j.week; c[keys.m]=j.month; set('ag_vc',JSON.stringify(c));
+      show(j.day,j.week,j.month);
+    }).catch(function(){ if(tries>0) setTimeout(function(){ go(tries-1); },1500); });
+  }
+  go(2);
 })();
 
 // 문의 게시판 (구글 시트 + Apps Script)
