@@ -150,6 +150,21 @@ h2{font-size:clamp(25px,3.6vw,34px);color:var(--navy);font-weight:800;letter-spa
 .shots.wide figure{flex:0 0 86%;max-width:none}
 .shots img{width:100%;display:block;border-radius:14px;box-shadow:0 8px 22px rgba(28,47,79,.16);border:1px solid var(--line)}
 .shots figcaption{text-align:center;font-size:12.5px;color:var(--sub);margin-top:8px;font-weight:700}
+.mtag{display:inline-block;margin-top:10px;font-size:12px;font-weight:700;color:var(--navy);background:var(--sky,#ebf4fc);border:1px solid var(--line);padding:3px 10px;border-radius:999px;cursor:pointer}
+.mtag:hover{border-color:var(--blue)}
+.mlock{margin-top:22px;border:1px solid var(--line);background:linear-gradient(180deg,#f7fbff,#fff);border-radius:16px;padding:16px 18px}
+.mlock b{display:block;color:var(--navy);font-size:15px}
+.mlock p{font-size:13.5px;color:var(--sub);margin:4px 0 10px}
+.mform{display:flex;gap:8px;flex-wrap:wrap}
+.mform input{flex:1;min-width:150px;font:inherit;font-size:15px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.mmsg{font-size:13px;color:#b0503a;margin-top:6px;min-height:1px}
+.mhint{font-size:12.5px!important;margin:6px 0 0!important}
+.manov{position:fixed;inset:0;z-index:300;background:#fff;display:none;flex-direction:column}
+.manov.on{display:flex}
+.manov .mbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);background:#fff}
+.manov .mbar b{font-size:14px;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.manov .mbar button{font:inherit;font-size:13px;font-weight:700;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;cursor:pointer;color:var(--navy);flex:none}
+.manov iframe{flex:1;border:0;width:100%}
 .sheetbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
 .shotnote{font-size:12.5px;color:var(--sub);margin-top:6px}
 .work .th svg{width:48px;height:48px;stroke:var(--navy);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
@@ -678,6 +693,7 @@ html,body{overflow-x:hidden}
 </footer>
 
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="manov" id="manOv" role="dialog" aria-label="제작 매뉴얼"><div class="mbar"><b id="manTitle">제작 매뉴얼</b><button type="button" id="manX">닫기 ✕</button></div><iframe id="manFrame" title="제작 매뉴얼" referrerpolicy="no-referrer"></iframe></div>
 <div class="modal" id="bmodal"><div class="sheet bview" id="bsheet" role="dialog" aria-modal="true" aria-label="문의 글"></div></div>
 
 <script>
@@ -747,7 +763,7 @@ function shotSrc(n){ return 'img/'+n+'.webp'; }
 el('workList').innerHTML = WORK.map(function(w,n){
   var thumb='<img src="'+shotSrc(w.shots[0][0])+'" alt="'+w.t+' 화면" loading="lazy"'+(w.tshift?' style="margin-top:-'+w.tshift+'px"':'')+'>';
   var badge=w.demo?'<span class="lockb">예시 화면</span>':'';
-  var inner='<div class="th '+w.k+' shot'+(w.wide?' wide':'')+'">'+thumb+badge+'</div><div class="bd"><div class="c">'+w.c+'</div><h3>'+w.t+'</h3><p>'+w.d+'</p><div class="more">자세히 보기 →</div></div>';
+  var inner='<div class="th '+w.k+' shot'+(w.wide?' wide':'')+'">'+thumb+badge+'</div><div class="bd"><div class="c">'+w.c+'</div><h3>'+w.t+'</h3><p>'+w.d+'</p><div class="more">자세히 보기 →</div><span class="mtag" data-man="'+n+'">🔒 제작 매뉴얼</span></div>';
   return '<div class="card work wk" data-w="'+n+'" role="button" tabindex="0">'+inner+'</div>';
 }).join('');
 function openWork(w){
@@ -760,11 +776,77 @@ function openWork(w){
    (w.demo?'<p class="shotnote">예시 이름과 숫자로 만든 화면이에요. 실제 성도 정보는 공개하지 않습니다.</p>':'<p class="shotnote">사진을 누르면 크게 볼 수 있어요.</p>')+
    '<h4>이런 일을 해요</h4><ul class="dot">'+w.feats.map(function(s){return '<li>'+s+'</li>'}).join('')+'</ul>'+
    '<h4>어떻게 만들었나요</h4><p style="font-size:14.5px">'+w.made+'</p>'+
-   '<div class="sheetbtns">'+btn+'</div>';
+   '<div id="manBox"></div><div class="sheetbtns">'+btn+'</div>';
   el('modal').classList.add('on'); el('sheet').scrollTop=0; el('x').onclick=closeM; var a2=el('ask2'); if(a2) a2.onclick=closeM;
+  manDefault(WORK.indexOf(w)+1);
 }
-el('workList').addEventListener('click',function(e){ var c=e.target.closest('[data-w]'); if(c) openWork(WORK[+c.dataset.w]); });
+el('workList').addEventListener('click',function(e){ var c=e.target.closest('[data-w]'); if(!c) return; openWork(WORK[+c.dataset.w]); if(e.target.closest('[data-man]')){ var mb=el('manBox'); manOpen(+c.dataset.w+1); if(mb) setTimeout(function(){ mb.scrollIntoView({block:'center'}); },60); } });
 el('workList').addEventListener('keydown',function(e){ var c=e.target.closest('[data-w]'); if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault(); openWork(WORK[+c.dataset.w]);} });
+
+// ===== 수강생 전용 제작 매뉴얼 (내용은 구글 시트에만 있고, 열람 코드가 맞을 때만 받아 옵니다) =====
+var MAN_CSS=":root{--navy:#1c2f4f;--ink:#2a3341;--sub:#6a7586;--line:#e4eaf1;--sky:#ebf4fc;--sky2:#d5e8f7;--blue:#3a7cc0;--gold:#c39a4c;--soft:#f7fafd}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:#fff;line-height:1.8;font-size:15.5px;-webkit-font-smoothing:antialiased}a{color:var(--blue)}.wrap{max-width:900px;margin:0 auto;padding:0 22px}header.hero{padding:58px 0 40px;background:radial-gradient(800px 320px at 90% -10%,#dcecfb 0,transparent 60%),radial-gradient(600px 300px at 0% 120%,#efeefd 0,transparent 60%),#f8fbfe;border-bottom:1px solid var(--line)}.crumb{font-size:13px;color:var(--sub)}.crumb a{color:var(--sub);text-decoration:none}.tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--blue);margin-top:18px}h1{font-family:'Noto Serif KR',serif;font-size:clamp(27px,4.6vw,38px);color:var(--navy);line-height:1.35;margin:6px 0 12px}.lead{color:var(--sub);font-size:16.5px;max-width:680px}.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}.chip{font-size:12.5px;background:#fff;border:1px solid var(--line);color:var(--navy);padding:5px 12px;border-radius:999px}.chip a{text-decoration:none}nav.toc{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}nav.toc .wrap{display:flex;gap:6px;overflow-x:auto;padding-top:10px;padding-bottom:10px;scrollbar-width:none}nav.toc a{flex:none;font-size:13px;color:var(--sub);text-decoration:none;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff}nav.toc a:hover{color:var(--navy);border-color:var(--blue)}section{padding:46px 0;border-bottom:1px solid var(--line)}section:last-of-type{border-bottom:0}.no{font-size:12.5px;font-weight:800;color:var(--blue);letter-spacing:.12em}h2{font-size:23px;color:var(--navy);margin:4px 0 16px;letter-spacing:-.01em}p{margin-bottom:10px}.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}.shots figure{background:var(--soft);border:1px solid var(--line);border-radius:14px;overflow:hidden}.shots img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;object-position:top}.shots figcaption{font-size:12.5px;color:var(--sub);padding:7px 10px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px}.box b{display:block;color:var(--navy);margin-bottom:4px}.box span{font-size:14px;color:var(--sub)}ul.dot{list-style:none}ul.dot li{position:relative;padding-left:16px;margin:5px 0}ul.dot li::before{content:\"\";position:absolute;left:0;top:.75em;width:6px;height:6px;border-radius:50%;background:var(--blue);opacity:.55}.steps{counter-reset:s;border-left:2px solid var(--sky2);margin-left:14px}.step{position:relative;padding:0 0 26px 28px;counter-increment:s}.step::before{content:counter(s);position:absolute;left:-15px;top:0;width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;font-size:13px;font-weight:800;display:grid;place-items:center}.step h3{font-size:17px;color:var(--navy);margin-bottom:4px}.step p{font-size:15px}.say{background:var(--navy);color:#e9f1fb;border-radius:12px;padding:12px 16px;margin:10px 0 4px;font-size:14px;line-height:1.7;position:relative;white-space:pre-line}.say small{display:block;color:#9fc3e8;font-size:11.5px;font-weight:800;margin-bottom:3px;letter-spacing:.04em}.say button{position:absolute;top:10px;right:10px;font-family:inherit;font-size:11.5px;border:0;background:rgba(255,255,255,.14);color:#fff;padding:3px 9px;border-radius:7px;cursor:pointer}.tip{background:#fffaf0;border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:10px 14px;font-size:14px;color:#5b4a2a;margin-top:8px}.tip b{color:#8d6a2c}.trouble{display:grid;gap:12px}.trouble .box{display:grid;grid-template-columns:1fr 1fr;gap:14px}.trouble .q{color:#b0503a;font-weight:700;font-size:14.5px}.trouble .q::before{content:\"막힌 점 \";color:#d0705a;font-size:12px}.trouble .a{font-size:14.5px}.trouble .a::before{content:\"해결 \";color:#3fa06d;font-size:12px;font-weight:800}.check{list-style:none}.check li{padding:9px 0 9px 32px;border-bottom:1px dashed var(--line);position:relative}.check li::before{content:\"\";position:absolute;left:2px;top:12px;width:18px;height:18px;border:2px solid var(--sky2);border-radius:5px;background:#fff}.check li.on::before{background:var(--blue);border-color:var(--blue)}.check li.on::after{content:\"\";position:absolute;left:8px;top:14px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}.check li{cursor:pointer}table{width:100%;border-collapse:collapse;font-size:14.5px}th,td{border-bottom:1px solid var(--line);padding:9px 8px;text-align:left;vertical-align:top}th{color:var(--sub);font-weight:700;font-size:13px;background:var(--soft)}footer{padding:36px 0 50px;color:var(--sub);font-size:13px;text-align:center;border-top:1px solid var(--line);margin-top:10px}footer a{color:var(--navy);text-decoration:none;font-weight:700}.pager{display:flex;justify-content:space-between;gap:12px;margin-top:20px}.pager a{flex:1;text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:12px 16px;color:var(--navy);font-size:14px;background:#fff}.pager a small{display:block;color:var(--sub);font-size:12px}.pager a.r{text-align:right}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:13px;padding:8px 14px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none}.toast.on{opacity:1}@media(max-width:720px){.shots{grid-template-columns:1fr 1fr}.grid2,.trouble .box{grid-template-columns:1fr}}@media print{nav.toc,.say button,.pager{display:none}section{break-inside:avoid-page}}";
+function mE(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function manHtml(n,m){
+  var two=function(i){return (i<10?'0':'')+i};
+  var h='<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>'+mE(m.title)+' · 제작 매뉴얼</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet"><style>'+MAN_CSS+'</style></head><body>';
+  h+='<header class="hero"><div class="wrap"><div class="tag">MANUAL '+two(n)+' · '+mE(m.cat)+'</div><h1>'+mE(m.title)+'</h1><p class="lead">'+mE(m.lead)+'</p><div class="chips">'+m.chips.map(function(c){return '<span class="chip">'+mE(c)+'</span>'}).join('')+'</div></div></header>';
+  var secs=[['what','무엇을 만들었나'],['prep','준비한 것과 도구'],['steps','이렇게 만들었어요'],['trouble','막혔던 점과 해결'],['run','운영과 관리'],['check','다시 만든다면 체크리스트']];
+  h+='<nav class="toc"><div class="wrap">'+secs.map(function(s){return '<a href="#'+s[0]+'" data-go="'+s[0]+'">'+s[1]+'</a>'}).join('')+'</div></nav><main class="wrap">';
+  h+='<section id="what"><div class="no">01</div><h2>무엇을 만들었나</h2><p>'+mE(m.what)+'</p><div class="shots">'+m.shots.map(function(s){return '<figure><img src="https://aigongbang.kr/img/'+s[0]+'.webp" alt="'+mE(s[1])+'" loading="lazy"><figcaption>'+mE(s[1])+'</figcaption></figure>'}).join('')+'</div><ul class="dot" style="margin-top:16px">'+m.feats.map(function(x){return '<li>'+mE(x)+'</li>'}).join('')+'</ul></section>';
+  h+='<section id="prep"><div class="no">02</div><h2>준비한 것과 도구</h2><div class="grid2"><div class="box"><b>미리 준비한 것</b><ul class="dot">'+m.prep.map(function(x){return '<li>'+mE(x)+'</li>'}).join('')+'</ul></div><div class="box"><b>들어간 비용</b><span>'+mE(m.cost)+'</span></div></div><table style="margin-top:16px"><tr><th style="width:30%">도구</th><th>이 작업에서 맡은 일</th></tr>'+m.tools.map(function(t){return '<tr><td><b>'+mE(t[0])+'</b></td><td>'+mE(t[1])+'</td></tr>'}).join('')+'</table></section>';
+  h+='<section id="steps"><div class="no">03</div><h2>이렇게 만들었어요</h2><div class="steps">'+m.steps.map(function(s){
+    var b='<div class="step"><h3>'+mE(s[0])+'</h3><p>'+mE(s[1])+'</p>';
+    if(s[2]) b+='<div class="say" data-t="'+mE(s[2])+'"><small>이렇게 말하면 돼요</small>'+mE(s[2])+'<button type="button">복사</button></div>';
+    if(s[3]) b+='<div class="tip"><b>팁 </b>'+mE(s[3])+'</div>';
+    return b+'</div>'}).join('')+'</div></section>';
+  h+='<section id="trouble"><div class="no">04</div><h2>막혔던 점과 해결</h2><div class="trouble">'+m.trouble.map(function(t){return '<div class="box"><div class="q">'+mE(t[0])+'</div><div class="a">'+mE(t[1])+'</div></div>'}).join('')+'</div></section>';
+  h+='<section id="run"><div class="no">05</div><h2>운영과 관리</h2><ul class="dot">'+m.run.map(function(x){return '<li>'+mE(x)+'</li>'}).join('')+'</ul></section>';
+  h+='<section id="check"><div class="no">06</div><h2>다시 만든다면 체크리스트</h2><p style="color:var(--sub);font-size:14px">누르면 체크돼요. 비슷한 결과물을 만들 때 순서대로 확인해 보세요.</p><ul class="check">'+m.check.map(function(x){return '<li>'+mE(x)+'</li>'}).join('')+'</ul><p style="margin-top:20px;font-size:13px;color:var(--sub)">수강생 전용 자료예요. 다른 곳에 옮겨 올리거나 공유하지 말아 주세요.</p></section></main>';
+  h+='<footer>대니의 AI 공방 · 제작 매뉴얼</footer><div class="toast" id="toast">복사했어요</div>';
+  h+='<scr'+'ipt>document.querySelectorAll("[data-go]").forEach(function(a){a.onclick=function(e){e.preventDefault();var t=document.getElementById(a.dataset.go);if(t)window.scrollTo({top:t.getBoundingClientRect().top+window.pageYOffset-60,behavior:"smooth"})}});'+
+     'document.querySelectorAll(".say button").forEach(function(b){b.onclick=function(){var t=b.parentNode.getAttribute("data-t");function ok(){var x=document.getElementById("toast");x.classList.add("on");setTimeout(function(){x.classList.remove("on")},1300)}try{navigator.clipboard.writeText(t).then(ok,function(){b.textContent="직접 복사해 주세요"})}catch(e){b.textContent="직접 복사해 주세요"}}});'+
+     'document.querySelectorAll(".check li").forEach(function(li){li.onclick=function(){li.classList.toggle("on")}});</scr'+'ipt></body></html>';
+  return h;
+}
+function manCode(){ try{return localStorage.getItem('ag_mcode')||''}catch(e){return ''} }
+function manShow(n,m){
+  manDefault(n);
+  var ov=el('manOv'); el('manTitle').textContent=m.title+' · 제작 매뉴얼';
+  el('manFrame').srcdoc=manHtml(n,m); ov.classList.add('on'); document.body.style.overflow='hidden';
+}
+function manClose(){ el('manOv').classList.remove('on'); el('manFrame').srcdoc=''; document.body.style.overflow=''; }
+function manLoad(n,code,msgEl,btn){
+  if(btn){btn.disabled=true; btn.textContent='확인 중…';}
+  if(msgEl) msgEl.textContent='';
+  fetch(BOARD_API+'?manual='+n+'&code='+encodeURIComponent(code)).then(function(r){return r.json()}).then(function(j){
+    if(btn){btn.disabled=false; btn.textContent='매뉴얼 열기';}
+    if(j&&j.ok&&j.data){ try{localStorage.setItem('ag_mcode',code)}catch(e){} manShow(n,j.data); }
+    else if(j&&j.err==='code'){ try{localStorage.removeItem('ag_mcode')}catch(e){} manAsk(n,'열람 코드가 맞지 않아요. 다시 확인해 주세요.'); }
+    else if(msgEl) msgEl.textContent='매뉴얼을 불러오지 못했어요. 잠시 뒤 다시 시도해 주세요.';
+  }).catch(function(){ if(btn){btn.disabled=false; btn.textContent='매뉴얼 열기';} if(msgEl) msgEl.textContent='연결이 원활하지 않아요. 잠시 뒤 다시 시도해 주세요.'; });
+}
+function manAsk(n,err){
+  var box=el('manBox'); if(!box) return;
+  box.innerHTML='<div class="mlock"><b>🔒 제작 매뉴얼 · 수강생 전용</b><p>이 결과물을 어떤 순서로, 어떻게 말하며 만들었는지 정리한 매뉴얼이에요. 강의를 신청하신 분께 드린 열람 코드를 넣어 주세요.</p>'+
+   '<form id="manForm" class="mform"><input id="manInp" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="20" placeholder="열람 코드" required><button class="btn pri" id="manBtn" type="submit">매뉴얼 열기</button></form>'+
+   '<div class="mmsg" id="manMsg">'+(err||'')+'</div><p class="mhint">코드가 없으신가요? <a href="#contact" id="manAsk2">강의 신청하기 →</a></p></div>';
+  el('manForm').onsubmit=function(e){ e.preventDefault(); var c=el('manInp').value.replace(/\s/g,'').toUpperCase(); if(c) manLoad(n,c,el('manMsg'),el('manBtn')); };
+  el('manAsk2').onclick=closeM;
+  if(err) el('manInp').focus();
+}
+function manDefault(n){
+  var box=el('manBox'); if(!box) return;
+  box.innerHTML='<div class="mlock"><b>🔒 제작 매뉴얼 · 수강생 전용</b><p>이 결과물을 어떤 순서로, 어떻게 말하며 만들었는지 단계별로 정리했어요. 그대로 따라 쓸 수 있는 요청 문장도 담았습니다.</p><button class="btn pri" type="button" id="manGo">매뉴얼 보기</button></div>';
+  el('manGo').onclick=function(){ manOpen(n); };
+}
+function manOpen(n){
+  var c=manCode();
+  if(c){ var box=el('manBox'); if(box) box.innerHTML='<div class="mlock"><b>🔒 제작 매뉴얼 · 수강생 전용</b><div class="mmsg" id="manMsg" style="color:var(--sub)">매뉴얼을 불러오고 있어요…</div></div>'; manLoad(n,c,el('manMsg'),null); }
+  else manAsk(n);
+}
+el('manX').onclick=manClose;
+document.addEventListener('keydown',function(e){ if(e.key==='Escape' && el('manOv').classList.contains('on')) manClose(); });
+
 el('lecSelect').innerHTML += LEC.map(function(x){return '<option>'+x.n+'강 · '+x.t+'</option>'}).join('');
 
 // lecture filter
