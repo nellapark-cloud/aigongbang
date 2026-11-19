@@ -67,6 +67,11 @@ button{font-family:inherit}
 @media (prefers-reduced-motion:reduce){.plate{animation:none}}
 section{padding:80px 0}
 .soft{background:var(--soft)}
+.intro-vid{position:relative;max-width:880px;margin:26px auto 0;border-radius:22px;overflow:hidden;background:#0f1a2c;box-shadow:0 18px 44px rgba(28,47,79,.16);aspect-ratio:16/9}
+.intro-vid video{display:block;width:100%;height:100%;object-fit:cover}
+.intro-vid .snd{position:absolute;right:16px;bottom:16px;display:flex;align-items:center;gap:7px;border:0;cursor:pointer;font:inherit;font-size:13.5px;font-weight:700;color:var(--navy);background:rgba(255,255,255,.92);padding:9px 15px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.intro-vid .snd svg{width:17px;height:17px;stroke:var(--navy);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:640px){.intro-vid{border-radius:16px}.intro-vid .snd{right:10px;bottom:10px;font-size:12.5px;padding:7px 12px}}
 .eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.14em;color:var(--blue);text-transform:uppercase}
 h2{font-size:clamp(25px,3.6vw,34px);color:var(--navy);font-weight:800;letter-spacing:-.02em;line-height:1.35;margin:8px 0 12px}
 .desc{color:var(--sub);max-width:620px;margin-bottom:38px}
@@ -387,6 +392,18 @@ html,body{overflow-x:hidden}
       <div><b>8<small>과정</small></b><span>대상별 AI 강의</span></div>
     </div>
   </div>
+
+  <section style="padding-bottom:0">
+    <div class="wrap">
+      <div class="eyebrow">Story</div>
+      <h2>작은 교회 목사의 밤, 이제 AI가 곁에서 돕습니다</h2>
+      <p class="desc">혼자 주보를 만들고 포스터를 붙들던 시간. 이제는 AI와 함께 뚝딱 만들어 냅니다.</p>
+      <div class="intro-vid">
+        <video id="introVid" src="img/intro.mp4" poster="img/intro-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="대니의 AI 공방 소개 영상"></video>
+        <button class="snd" id="introSnd" type="button" aria-label="소리 켜기"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l4 6M21 9l-4 6"/></svg><span>소리 켜기</span></button>
+      </div>
+    </div>
+  </section>
 
   <section>
     <div class="wrap">
@@ -967,6 +984,13 @@ el('form').addEventListener('submit',function(e){
       .catch(function(){ el('gbNote').textContent='잠시 저장이 안 되고 있어요. 조금 뒤에 다시 시도해 주세요.'; })
       .then(function(){ btn.disabled=false; btn.textContent='남기기'; });
   });
+})();
+</script>
+<script>
+(function(){var v=document.getElementById('introVid'),b=document.getElementById('introSnd');if(!v||!b)return;
+var on='<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span>소리 끄기</span>',off=b.innerHTML;
+b.addEventListener('click',function(){v.muted=!v.muted;if(!v.muted){v.currentTime=0;v.play();}b.innerHTML=v.muted?off:on;b.setAttribute('aria-label',v.muted?'소리 켜기':'소리 끄기');});
+if('IntersectionObserver' in window)new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){var p=v.play();if(p&&p.catch)p.catch(function(){});}else v.pause();});},{threshold:.25}).observe(v);
 })();
 </script>
 </body>
