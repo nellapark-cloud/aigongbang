@@ -259,6 +259,12 @@ form textarea{min-height:110px;resize:vertical}
 .cs-item b{color:var(--ink);font-weight:600;margin-right:4px}
 .cs-item.in{animation:csin .5s ease}
 @keyframes csin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.perk{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,#fff8ea,#fffdf7);border:1px solid #ecdcb8;border-radius:16px;padding:16px 18px;margin:-14px 0 28px;max-width:720px}
+.perk-ic{flex:none;width:40px;height:40px;border-radius:12px;background:#c39a4c;display:grid;place-items:center}
+.perk-ic svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.perk b{display:block;color:#7a5a22;font-size:15.5px;margin-bottom:2px}
+.perk span{font-size:14px;color:var(--ink)}
+.gbperk{font-size:10.5px;font-weight:800;color:#fff;background:#c39a4c;border-radius:6px;padding:1px 6px;letter-spacing:.02em}
 .gbbtn{display:inline-flex;align-items:center;gap:5px;margin:22px 0 0 14px;padding:0;color:#a8884a;font-size:12.5px;font-weight:700;vertical-align:top;transition:.2s}
 .gbbtn:hover{color:#7a5a22}
 .gbbtn span{transition:.2s}
@@ -350,7 +356,7 @@ html,body{overflow-x:hidden}
           <span>이번 주 <b id="vWeek">·</b></span>
           <span>이번 달 <b id="vMonth">·</b></span>
         </div>
-        <a href="#guestbook" class="gbbtn">응원·후기 남기기 <em id="gbBadge" style="display:none"></em><span>→</span></a>
+        <a href="#guestbook" class="gbbtn" title="응원글을 남기시면 강의·제작 때 혜택을 드려요">응원·후기 남기기 <em id="gbBadge" style="display:none"></em><small class="gbperk">혜택</small><span>→</span></a>
         <a href="#guestbook" class="cheerstrip" id="cheerStrip" style="display:none" aria-label="최근 응원과 방문 후기">
           <span class="cs-label">최근 응원·후기</span>
           <span class="cs-viewport"><span class="cs-item" id="csItem"></span></span>
@@ -445,6 +451,10 @@ html,body{overflow-x:hidden}
       <div class="eyebrow">Guestbook</div>
       <h2>응원과 방문 후기</h2>
       <p class="desc">2027년 문을 열기 전, 응원의 한마디나 짧은 방문 후기를 남겨 주세요. 공방을 준비하는 데 큰 힘이 됩니다.</p>
+      <div class="perk">
+        <span class="perk-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 21V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></span>
+        <div><b>응원해 주신 분께 감사의 혜택을 드려요</b><span>응원글을 남겨 주신 분이 나중에 강의나 제작을 맡겨 주시면 혜택을 드립니다. 문의하실 때 남기신 이름을 함께 알려 주세요.</span></div>
+      </div>
       <div class="gb">
         <form class="card gbform" id="gbForm" autocomplete="off">
           <div class="gbkind" role="radiogroup" aria-label="글 종류">
