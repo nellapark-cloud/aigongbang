@@ -730,9 +730,9 @@ var WORK=[
 ];
 
 function el(id){return document.getElementById(id)}
-function lecCard(x){return '<div class="card lec" data-n="'+x.n+'" data-lv="'+x.lv+'"><div class="n">'+x.n+'</div><h3>'+x.t+'</h3><p>'+x.s+'</p><div class="tags"><span class="tag lv">'+x.lv+'</span><span class="tag">'+x.who+'</span><span class="tag">'+x.time+'</span></div><div class="more">자세히 보기 →</div></div>'}
+function lecCard(x,i,arr,num){return '<div class="card lec" data-n="'+x.n+'" data-lv="'+x.lv+'"><div class="n">'+(num||x.n)+'</div><h3>'+x.t+'</h3><p>'+x.s+'</p><div class="tags"><span class="tag lv">'+x.lv+'</span><span class="tag">'+x.who+'</span><span class="tag">'+x.time+'</span></div><div class="more">자세히 보기 →</div></div>'}
 el('lecList').innerHTML = LEC.map(lecCard).join('');
-el('homeLec').innerHTML = [LEC[0],LEC[1],LEC[3]].map(lecCard).join('');
+el('homeLec').innerHTML = [LEC[0],LEC[1],LEC[3]].map(function(x,i){ return lecCard(x,i,null,'0'+(i+1)); }).join('');
 function shotSrc(n){ return 'img/'+n+'.webp'; }
 el('workList').innerHTML = WORK.map(function(w,n){
   var thumb='<img src="'+shotSrc(w.shots[0][0])+'" alt="'+w.t+' 화면" loading="lazy"'+(w.tshift?' style="margin-top:-'+w.tshift+'px"':'')+'>';
