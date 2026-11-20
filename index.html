@@ -249,6 +249,9 @@ form textarea{min-height:110px;resize:vertical}
 .gbkind input:checked+span{background:var(--navy);border-color:var(--navy);color:#fff}
 .gbcount{float:right;font-weight:500;color:var(--sub);font-size:12.5px}
 .gbnote{font-size:12.5px;color:var(--sub);margin-top:10px}
+.gbform input[type=email]{width:100%;font-family:inherit;font-size:15px;border:1px solid var(--line);border-radius:11px;padding:11px 13px;outline:none}
+.gbopt{font-weight:500;font-size:12px;color:var(--sub);margin-left:4px}
+.gbpriv{font-size:12px;color:var(--sub);margin-top:6px}
 .gbtabs{display:flex;align-items:center;gap:6px;margin-bottom:12px}
 .gbtabs button{font-family:inherit;font-size:13px;border:1px solid var(--line);background:#fff;color:var(--sub);padding:6px 13px;border-radius:999px;cursor:pointer}
 .gbtabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
@@ -468,7 +471,7 @@ html,body{overflow-x:hidden}
       <p class="desc">2027년 문을 열기 전, 응원의 한마디나 짧은 방문 후기를 남겨 주세요. 공방을 준비하는 데 큰 힘이 됩니다.</p>
       <div class="perk">
         <span class="perk-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 21V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></span>
-        <div><b>응원해 주신 분께 감사의 혜택을 드려요</b><span>응원글을 남겨 주신 분이 나중에 강의나 제작을 맡겨 주시면 혜택을 드립니다. 문의하실 때 남기신 이름을 함께 알려 주세요.</span></div>
+        <div><b>응원해 주신 분께 감사의 혜택을 드려요</b><span>응원글과 함께 이메일을 남겨 주시면, 포트폴리오별 제작 매뉴얼을 볼 수 있는 <b style="display:inline;color:inherit">열람 코드</b>를 이메일로 보내 드려요. 나중에 강의나 제작을 맡겨 주실 때도 혜택을 드립니다.</span></div>
       </div>
       <div class="gb">
         <form class="card gbform" id="gbForm" autocomplete="off">
@@ -480,9 +483,12 @@ html,body{overflow-x:hidden}
           <input id="gbName" name="name" required maxlength="12" placeholder="예: 세종의 김집사">
           <label for="gbMsg">한마디 <span class="gbcount" id="gbCount">0/100</span></label>
           <textarea id="gbMsg" name="msg" required maxlength="100" placeholder="예: 작은 교회에 꼭 필요한 공방이에요. 응원합니다!"></textarea>
+          <label for="gbMail">이메일 <span class="gbopt">선택 · 매뉴얼 열람 코드 받을 곳</span></label>
+          <input id="gbMail" name="email" type="email" maxlength="80" placeholder="예: name@example.com">
+          <p class="gbpriv">이메일은 공개되지 않고 열람 코드를 보내 드리는 데만 써요.</p>
           <input type="text" name="_hp" style="display:none" tabindex="-1" autocomplete="off">
           <button class="btn pri" id="gbBtn" style="width:100%;justify-content:center;margin-top:14px">남기기</button>
-          <p class="gbnote" id="gbNote">남긴 글은 모두에게 보여요. 연락처 같은 개인정보는 적지 말아 주세요.</p>
+          <p class="gbnote" id="gbNote">이름과 한마디는 모두에게 보여요. 한마디에는 연락처 같은 개인정보를 적지 말아 주세요.</p>
         </form>
         <div class="gbwall">
           <div class="gbtabs" id="gbTabs"><button class="on" data-f="">전체</button><button data-f="응원">응원</button><button data-f="후기">후기</button><span id="gbTotal"></span></div>
@@ -1094,13 +1100,22 @@ el('form').addEventListener('submit',function(e){
     if(f.get('_hp')) return;
     var last=0; try{ last=+localStorage.getItem('ag_gb_last')||0; }catch(err){}
     if(Date.now()-last<60000){ el('gbNote').textContent='잠시 후 다시 남겨 주세요. (1분에 한 번)'; return; }
+    var mail=String(f.get('email')||'').trim().slice(0,80);
+    if(mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ el('gbNote').textContent='이메일 주소를 다시 확인해 주세요.'; return; }
     btn.disabled=true; btn.textContent='남기는 중…';
+    if(mail){
+      fetch('https://formsubmit.co/ajax/nellapark@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({
+        _subject:'[대니의 AI 공방] 매뉴얼 열람 코드 요청 · '+String(f.get('name')).trim().slice(0,12),
+        _template:'table', _replyto:mail,
+        '이름':String(f.get('name')).trim().slice(0,12), '이메일':mail, '글 종류':f.get('kind'), '한마디':String(f.get('msg')).trim().slice(0,100)
+      })}).catch(function(){});
+    }
     api({action:'gb_create',kind:f.get('kind'),name:String(f.get('name')).trim().slice(0,12),msg:String(f.get('msg')).trim().slice(0,100)})
       .then(function(j){
         if(!j || !j.ok) throw 0;
         try{ localStorage.setItem('ag_gb_last',String(Date.now())); }catch(err){}
         form.reset(); el('gbCount').textContent='0/100';
-        el('gbNote').textContent='고맙습니다! 남겨 주신 마음이 큰 힘이 돼요.';
+        el('gbNote').textContent='고맙습니다! 남겨 주신 마음이 큰 힘이 돼요.'+(mail?' 열람 코드는 이메일로 보내 드릴게요.':'');
         return load();
       })
       .catch(function(){ el('gbNote').textContent='잠시 저장이 안 되고 있어요. 조금 뒤에 다시 시도해 주세요.'; })
