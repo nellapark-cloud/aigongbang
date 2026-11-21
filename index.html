@@ -907,14 +907,31 @@ document.addEventListener('click',function(e){ var c=e.target.closest('.lec'); i
 
 // router
 var pages=['home','about','lectures','portfolio','process','contact','guestbook'];
+function pageFromUrl(){
+  var q=(location.search.match(/[?&]p=([a-z]+)/)||[])[1];
+  var h=(location.hash||'').replace('#','');
+  var path=location.pathname.replace(/^\/+|\/+$/g,'');
+  var p=q||(pages.indexOf(h)>=0?h:'')||path||'home';
+  return pages.indexOf(p)<0?'home':p;
+}
+function cleanUrl(p){ return p==='home'?'/':'/'+p; }
 function route(){
-  var p=(location.hash||'').replace('#','');
-  if(pages.indexOf(p)<0) p='home';
+  var p=pageFromUrl();
+  if(location.pathname+location.search+location.hash!==cleanUrl(p)){ try{ history.replaceState(null,'',cleanUrl(p)); }catch(e){} }
   pages.forEach(function(x){ el('p-'+x).classList.toggle('on', x===p); });
   document.querySelectorAll('#gnb a').forEach(function(a){ a.classList.toggle('on', a.dataset.p===p); });
   el('gnb').classList.remove('open');
   window.scrollTo(0,0);
 }
+document.addEventListener('click',function(e){
+  if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey) return;
+  var a=e.target.closest('a[href^="#"]'); if(!a) return;
+  var p=a.getAttribute('href').slice(1); if(pages.indexOf(p)<0) return;
+  e.preventDefault();
+  if(location.pathname!==cleanUrl(p)){ try{ history.pushState(null,'',cleanUrl(p)); }catch(err){} }
+  route();
+});
+window.addEventListener('popstate',route);
 window.addEventListener('hashchange',route); route();
 el('burger').onclick=function(){ el('gnb').classList.toggle('open'); };
 
